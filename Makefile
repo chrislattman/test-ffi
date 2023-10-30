@@ -20,12 +20,12 @@ PYTHON3=/usr/bin/python3
 endif
 
 java: libfraction
-	$(JAVAC) -h java_ffi java_ffi/FractionTester.java
-	$(CC) -shared -fpic -I $(INCLUDE) -o java_ffi/$(LIBNAME) java_ffi/FractionTester.c
-	$(JAVA) -cp java_ffi -Djava.library.path=$(PWD)/java_ffi java_ffi.FractionTester
+	$(JAVAC) java_ffi/FractionTester.java
+	$(CC) -shared -fpic -I $(INCLUDE) -o java_ffi/$(LIBNAME) java_ffi/java_ffi_FractionTester.c
+	$(JAVA) -Djava.library.path=$(PWD)/java_ffi java_ffi.FractionTester
 
 libfraction:
 	$(CC) -shared -fpic -o libfraction.so libfraction.c
 
 clean:
-	rm -rf *.so java_ffi/*.class java_ffi/*.so java_ffi/*.dylib java_ffi/java_ffi_*.h
+	rm -rf *.so java_ffi/*.class java_ffi/*.so java_ffi/*.dylib

@@ -1,11 +1,11 @@
-#include <jni.h>
 #include <dlfcn.h>
+#include "java_ffi_FractionTester.h" // this file was generated with: javac -h java_ffi
 
 typedef struct fraction {
     int numerator, denominator;
 } Fraction;
 
-JNIEXPORT jint JNICALL Java_FractionTester_fractionMultiply(
+JNIEXPORT jint JNICALL Java_java_1ffi_FractionTester_fractionMultiply(
         JNIEnv *env, jobject thisObject, jobject frac1, jobject frac2) {
     // Local variables
     void *handle;
@@ -37,8 +37,8 @@ JNIEXPORT jint JNICALL Java_FractionTester_fractionMultiply(
     // These are jints which are typedef'd ints
     frac1Numerator = (*env)->GetIntField(env, frac1, frac1NumeratorID);
     frac1Denominator = (*env)->GetIntField(env, frac1, frac1DenominatorID);
-    frac1Numerator = (*env)->GetIntField(env, frac1, frac2NumeratorID);
-    frac2Denominator = (*env)->GetIntField(env, frac1, frac2DenominatorID);
+    frac2Numerator = (*env)->GetIntField(env, frac2, frac2NumeratorID);
+    frac2Denominator = (*env)->GetIntField(env, frac2, frac2DenominatorID);
 
     // Call the function
     f1 = (Fraction) { .numerator = frac1Numerator, .denominator = frac1Denominator};

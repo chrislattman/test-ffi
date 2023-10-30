@@ -20,6 +20,6 @@ public class FractionTester {
         System.out.println("Return value = " + retval);
     }
 
-    // Maps to Java_FractionTester_fractionMultiply
+    // Maps to Java_java_1ffi_FractionTester_fractionMultiply
     private native int fractionMultiply(Fraction frac1, Fraction frac2);
 }
