@@ -25,7 +25,7 @@ java: libfraction
 	$(JAVA) -Djava.library.path=$(PWD)/java_ffi java_ffi.FractionTester
 
 python: libfraction
-	$(PYTHON3) fraction_tester.py
+	$(PYTHON3) python_ffi/fraction_tester.py
 
 go: libfraction
 	$(CC) -shared -fpic -o go_ffi/ffi_glue/libgoffi.so go_ffi/ffi_glue/go_ffi.c
