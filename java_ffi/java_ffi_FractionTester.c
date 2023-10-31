@@ -1,10 +1,30 @@
 #include <dlfcn.h>
 #include "java_ffi_FractionTester.h" // this file was generated with: javac -h java_ffi
 
+static JNIEnv *g_env;
+static jobject g_frac1, g_frac2;
+static jmethodID g_frac1PrintFuncID, g_frac2PrintFuncID;
+
+// Mimics the structure in libfraction.c
 typedef struct fraction {
     int numerator, denominator;
     const char *str;
+    void (*print_func)(const char *);
 } Fraction;
+
+void frac1_print_func(const char *arg_str) {
+    jvalue frac1PrintArgs[1];
+
+    frac1PrintArgs[0].l = (*g_env)->NewStringUTF(g_env, arg_str);
+    (*g_env)->CallVoidMethodA(g_env, g_frac1, g_frac1PrintFuncID, frac1PrintArgs);
+}
+
+void frac2_print_func(const char *arg_str) {
+    jvalue frac2PrintArgs[1];
+
+    frac2PrintArgs[0].l = (*g_env)->NewStringUTF(g_env, arg_str);
+    (*g_env)->CallVoidMethodA(g_env, g_frac2, g_frac2PrintFuncID, frac2PrintArgs);
+}
 
 JNIEXPORT jint JNICALL Java_java_1ffi_FractionTester_fractionMultiply(
         JNIEnv *env, jobject thisObject, jobject frac1, jobject frac2) {
@@ -26,6 +46,9 @@ JNIEXPORT jint JNICALL Java_java_1ffi_FractionTester_fractionMultiply(
 
     // String signature from https://docs.oracle.com/en/java/javase/21/docs/specs/jni/types.html#type-signatures
     const char *str_sig = "Ljava/lang/String;";
+
+    // Function pointer signature (V means void return type)
+    const char *func_ptr_sig = "(Ljava/lang/String;)V";
 
     // Retrieve function symbol
     handle = dlopen("../libfraction.so", RTLD_NOW);
@@ -56,9 +79,27 @@ JNIEXPORT jint JNICALL Java_java_1ffi_FractionTester_fractionMultiply(
     frac2StrObj = (*env)->GetObjectField(env, frac2, frac2StrID);
     frac2Str = (*env)->GetStringUTFChars(env, frac2StrObj, &frac2StrIsCopy);
 
+    // Obtains the method IDs of the Java callback functions and sets
+    // global variables used by callback functions
+    g_frac1PrintFuncID = (*env)->GetMethodID(env, frac1Class, "printFunc", func_ptr_sig);
+    g_frac2PrintFuncID = (*env)->GetMethodID(env, frac2Class, "printFunc", func_ptr_sig);
+    g_env = env;
+    g_frac1 = frac1;
+    g_frac2 = frac2;
+
     // Call the function
-    f1 = (Fraction) { .numerator = frac1Numerator, .denominator = frac1Denominator, .str = frac1Str};
-    f2 = (Fraction) { .numerator = frac2Numerator, .denominator = frac2Denominator, .str = frac2Str};
+    f1 = (Fraction) {
+        .numerator = frac1Numerator,
+        .denominator = frac1Denominator,
+        .str = frac1Str,
+        .print_func = frac1_print_func
+    };
+    f2 = (Fraction) {
+        .numerator = frac2Numerator,
+        .denominator = frac2Denominator,
+        .str = frac2Str,
+        .print_func = frac2_print_func
+    };
     retval = fraction_multiply(&f1, &f2);
 
     // Set frac1's fields to values from f1

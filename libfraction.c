@@ -1,5 +1,4 @@
 #include <stdlib.h>
-#include <stdio.h>
 
 /**
  * @brief Fraction data type
@@ -8,6 +7,7 @@
 typedef struct fraction {
     int numerator, denominator;
     const char *str;
+    void (*print_func)(const char *);
 } Fraction;
 
 /**
@@ -25,8 +25,8 @@ int fraction_multiply(Fraction *frac1, Fraction *frac2)
         int denominator = frac1->denominator * frac2->denominator;
         frac1->numerator = numerator;
         frac1->denominator = denominator;
-        printf("frac1->str = %s\n", frac1->str);
-        printf("frac2->str = %s\n", frac2->str);
+        frac1->print_func(frac1->str);
+        frac2->print_func(frac2->str);
         return 0;
     }
     return -1;
