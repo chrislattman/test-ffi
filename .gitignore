@@ -2,3 +2,6 @@
 *.dylib
 *.class
 .vscode
+nodejs_ffi/node_modules
+nodejs_ffi/build
+nodejs_ffi/package-lock.json

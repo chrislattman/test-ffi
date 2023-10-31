@@ -1,3 +1,4 @@
+// This is the "glue code" that calls libfraction.so
 #include <dlfcn.h>
 #include <stdio.h>
 #include "go_ffi.h"

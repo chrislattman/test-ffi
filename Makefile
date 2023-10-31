@@ -31,8 +31,13 @@ go: libfraction
 	$(CC) -shared -fpic -o go_ffi/ffi_glue/libgoffi.so go_ffi/ffi_glue/go_ffi.c
 	go run go_ffi/fraction_tester.go
 
+nodejs: libfraction
+	npm --prefix nodejs_ffi/ install
+	npx tsc --strict nodejs_ffi/fraction_tester.ts
+	node nodejs_ffi/
+
 libfraction:
 	$(CC) -shared -fpic -o libfraction.so libfraction.c
 
 clean:
-	rm -rf *.so java_ffi/*.class java_ffi/*.so java_ffi/*.dylib go_ffi/ffi_glue/*.so
+	rm -rf *.so java_ffi/*.class java_ffi/*.so java_ffi/*.dylib go_ffi/ffi_glue/*.so nodejs_ffi/*.js nodejs_ffi/build

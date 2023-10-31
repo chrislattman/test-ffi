@@ -1,0 +1,11 @@
+{
+  "name": "node_ffi",
+  "main": "fraction_tester.js",
+  "dependencies": {
+    "bindings": "~1.2.1"
+  },
+  "scripts": {
+    "test": "node fraction_tester.js"
+  },
+  "gypfile": true
+}
