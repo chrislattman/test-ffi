@@ -1,5 +1,5 @@
 #include <dlfcn.h>
-#include "java_ffi_FractionTester.h" // this file was generated with: javac -h java_ffi
+#include "java_ffi_FractionTester.h" // this file was generated with: javac -h java_ffi java_ffi/*.java
 
 static JNIEnv *g_env;
 static jobject g_frac1, g_frac2;
