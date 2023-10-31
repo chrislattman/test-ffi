@@ -20,7 +20,6 @@ libfraction = ctypes.CDLL("libfraction.so")
 
 # Optional for our purposes, but necessary for variadic functions
 # libfraction.fraction_multiply.argtypes = [ctypes.POINTER(Fraction), ctypes.POINTER(Fraction)]
-# libfraction.fraction_multiply.restype = ctypes.c_int
 
 frac1 = Fraction(10, 13, b"Hello", print_func)
 frac2 = Fraction(9, 17, b"World!", print_func)

@@ -27,8 +27,12 @@ java: libfraction
 python: libfraction
 	$(PYTHON3) fraction_tester.py
 
+go: libfraction
+	$(CC) -shared -fpic -o go_ffi/ffi_glue/libgoffi.so go_ffi/ffi_glue/go_ffi.c
+	go run go_ffi/fraction_tester.go
+
 libfraction:
 	$(CC) -shared -fpic -o libfraction.so libfraction.c
 
 clean:
-	rm -rf *.so java_ffi/*.class java_ffi/*.so java_ffi/*.dylib
+	rm -rf *.so java_ffi/*.class java_ffi/*.so java_ffi/*.dylib go_ffi/ffi_glue/*.so
