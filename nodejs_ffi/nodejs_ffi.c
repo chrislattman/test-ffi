@@ -44,9 +44,8 @@ static napi_value nodejs_fraction_multiply(napi_env env, napi_callback_info info
 #define DECLARE_NAPI_METHOD(name, func) { name, 0, func, 0, 0, 0, napi_default, 0 }
 
 napi_value Init(napi_env env, napi_value exports) {
-    napi_status status;
     napi_property_descriptor addDescriptor = DECLARE_NAPI_METHOD("nodejs_fraction_multiply", nodejs_fraction_multiply);
-    status = napi_define_properties(env, exports, 1, &addDescriptor);
+    napi_define_properties(env, exports, 1, &addDescriptor);
     return exports;
 }
 
