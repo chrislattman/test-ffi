@@ -1,4 +1,4 @@
-// This is the "glue code" that calls libfraction.so
+// This is the "glue code" that loads the libfraction shared library
 #include <node_api.h>
 #include <dlfcn.h>
 

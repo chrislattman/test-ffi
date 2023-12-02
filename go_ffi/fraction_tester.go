@@ -1,7 +1,7 @@
 package main
 
 /*
-#cgo LDFLAGS: -L. -lgoffi
+#cgo LDFLAGS: -L. -lgo_ffi
 
 #include <stdlib.h>
 #include "go_ffi.h"

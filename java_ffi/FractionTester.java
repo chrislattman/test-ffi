@@ -3,8 +3,8 @@ package java_ffi;
 // Class that uses the Java Native Interface (JNI)
 public class FractionTester {
     static {
-        // Loads the libnative shared library
-        System.loadLibrary("native");
+        // Loads the libjava_ffi library
+        System.loadLibrary("java_ffi");
     }
 
     public static void main(String[] args) {
@@ -24,4 +24,13 @@ public class FractionTester {
 
     // "Abstract" function which maps to Java_java_1ffi_FractionTester_fractionMultiply
     private native int fractionMultiply(Fraction frac1, Fraction frac2);
+
+    static class Fraction {
+        int numerator, denominator;
+        String str;
+
+        void printFunc(String arg_string) {
+            System.out.println(arg_string);
+        }
+    }
 }
