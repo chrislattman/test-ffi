@@ -6,3 +6,4 @@ nodejs_ffi/node_modules
 nodejs_ffi/build
 nodejs_ffi/package-lock.json
 .DS_Store
+go_ffi/go_ffi

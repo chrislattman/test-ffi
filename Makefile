@@ -32,8 +32,9 @@ python: libfraction
 	$(PYTHON3) python_ffi/fraction_tester.py
 
 go: libfraction
-	$(CC) -shared -fpic -o go_ffi/ffi_glue/$(LIBGOFFI) go_ffi/ffi_glue/go_ffi.c
-	# go run go_ffi/fraction_tester.go
+	$(CC) -shared -fpic -o go_ffi/$(LIBGOFFI) go_ffi/go_ffi.c
+	cd go_ffi; go build
+	go_ffi/go_ffi
 
 nodejs: libfraction
 	npm --prefix nodejs_ffi/ install
@@ -44,4 +45,4 @@ libfraction:
 	$(CC) -shared -fpic -o $(LIBFRACTION) libfraction.c
 
 clean:
-	rm -rf *.so *.dylib java_ffi/*.class java_ffi/*.so java_ffi/*.dylib go_ffi/ffi_glue/*.so go_ffi/ffi_glue/*.dylib nodejs_ffi/*.js nodejs_ffi/build
+	rm -rf *.so *.dylib **/*.so **/*.dylib java_ffi/*.class go_ffi/go_ffi nodejs_ffi/*.js nodejs_ffi/build
