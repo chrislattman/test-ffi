@@ -1,6 +1,7 @@
 package main
 
 /*
+// This code block is a cgo preamble
 #cgo LDFLAGS: -L. -lgo_ffi
 
 #include <stdlib.h>
