@@ -2,6 +2,9 @@ package main
 
 /*
 // This code block is a cgo preamble
+
+// This links the code in go_ffi.c, which is compiled into a separate library
+// prior to building the Go project
 #cgo LDFLAGS: -L. -lgo_ffi
 
 #include <stdlib.h>
