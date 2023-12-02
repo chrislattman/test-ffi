@@ -12,7 +12,11 @@ int frac_mult(Fraction *f1, Fraction *f2) {
     int (*fraction_multiply)(Fraction *, Fraction *);
     int retval;
 
+#ifdef __APPLE__
+    handle = dlopen("../../libfraction.dylib", RTLD_NOW);
+#else
     handle = dlopen("../../libfraction.so", RTLD_NOW);
+#endif
     *(void **)(&fraction_multiply) = dlsym(handle, "fraction_multiply");
 
     f1->print_func = print;

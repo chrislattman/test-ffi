@@ -52,7 +52,11 @@ JNIEXPORT jint JNICALL Java_java_1ffi_FractionTester_fractionMultiply(
     const char *func_ptr_sig = "(Ljava/lang/String;)V";
 
     // Retrieve function symbol
+#ifdef __APPLE__
+    handle = dlopen("../libfraction.dylib", RTLD_NOW);
+#else
     handle = dlopen("../libfraction.so", RTLD_NOW);
+#endif
     *(void **)(&fraction_multiply) = dlsym(handle, "fraction_multiply");
 
     // Obtains the jclass of the Fraction jobjects

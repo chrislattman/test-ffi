@@ -8,20 +8,22 @@ CC=gcc-13
 JAVAC=/usr/local/Cellar/openjdk/21.0.1/bin/javac
 JAVA=/usr/local/Cellar/openjdk/21.0.1/bin/java
 INCLUDE=/usr/local/Cellar/openjdk/21.0.1/include # this is for jni.h
-LIBNAME=libnative.dylib
+LIBNATIVE=libnative.dylib
 PYTHON3=/usr/local/bin/python3
+LIBFRACTION=libfraction.dylib
 else
 CC=gcc
 JAVAC=/usr/bin/javac
 JAVA=/usr/bin/java
 INCLUDE=/usr/lib/jvm/java-17-openjdk-amd64/include # this is for jni.h
-LIBNAME=libnative.so
+LIBNATIVE=libnative.so
 PYTHON3=/usr/bin/python3
+LIBFRACTION=libfraction.so
 endif
 
 java: libfraction
 	$(JAVAC) java_ffi/*.java
-	$(CC) -shared -fpic -I $(INCLUDE) -o java_ffi/$(LIBNAME) java_ffi/java_ffi_FractionTester.c
+	$(CC) -shared -fpic -I$(INCLUDE) -o java_ffi/$(LIBNATIVE) java_ffi/java_ffi_FractionTester.c
 	$(JAVA) -Djava.library.path=$(PWD)/java_ffi java_ffi.FractionTester
 
 python: libfraction
@@ -37,7 +39,7 @@ nodejs: libfraction
 	node nodejs_ffi/
 
 libfraction:
-	$(CC) -shared -fpic -o libfraction.so libfraction.c
+	$(CC) -shared -fpic -o $(LIBFRACTION) libfraction.c
 
 clean:
-	rm -rf *.so java_ffi/*.class java_ffi/*.so java_ffi/*.dylib go_ffi/ffi_glue/*.so nodejs_ffi/*.js nodejs_ffi/build
+	rm -rf *.so *.dylib java_ffi/*.class java_ffi/*.so java_ffi/*.dylib go_ffi/ffi_glue/*.so nodejs_ffi/*.js nodejs_ffi/build
