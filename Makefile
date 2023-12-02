@@ -28,8 +28,12 @@ python: libfraction
 
 go: libfraction
 	$(CC) -shared -fpic -o go_ffi/libgo_ffi$(LIBEXT) go_ffi/go_ffi.c
-	cd go_ffi; go build
-	go_ffi/go_ffi
+	# To build the executable separately:
+	# cd go_ffi; go build
+	# go_ffi/go_ffi
+	#
+	# To build and run in one command:
+	go run go_ffi/fraction_tester.go go_ffi/cfuncs.go
 
 nodejs: libfraction
 	npm --prefix nodejs_ffi/ install
@@ -40,4 +44,4 @@ libfraction:
 	$(CC) -shared -fpic -o libfraction$(LIBEXT) libfraction.c
 
 clean:
-	rm -rf *$(LIBEXT) **/*$(LIBEXT) go_ffi/go_ffi nodejs_ffi/*.js nodejs_ffi/build
+	rm -rf *$(LIBEXT) **/*$(LIBEXT) nodejs_ffi/*.js nodejs_ffi/build go_ffi/go_ffi
