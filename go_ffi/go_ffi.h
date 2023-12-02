@@ -7,4 +7,4 @@ typedef struct fraction {
     void (*print_func)(const char *);
 } Fraction;
 
-int frac_mult(Fraction *f1, Fraction *f2);
+int frac_mult(Fraction *, Fraction *);

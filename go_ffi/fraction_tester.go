@@ -6,7 +6,7 @@ package main
 #include <stdlib.h>
 #include "go_ffi.h"
 
-void print_cgo(const char *arg_str);
+void print_cgo(const char *);
 */
 import "C"
 import (
