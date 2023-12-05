@@ -1,32 +1,34 @@
 SHELL=/bin/bash
 
-OS=$(shell echo `uname`)
+OS=$(shell echo `uname -a`)
 PWD=$(shell pwd)
 
-ifeq ($(OS),Darwin)
-CC=gcc-13
-JAVAC=/usr/local/Cellar/openjdk/21.0.1/bin/javac
-JAVA=/usr/local/Cellar/openjdk/21.0.1/bin/java
+ifneq ($(findstring x86_64,$(OS)),)
 INCLUDE=/usr/local/Cellar/openjdk/21.0.1/include # this is for jni.h
-PYTHON3=/usr/local/bin/python3
+ARCH=amd64
+else
+INCLUDE=/opt/homebrew/opt/openjdk/include # this is for jni.h
+ARCH=aarch64
+endif
+
+ifneq ($(findstring Darwin,$(OS)),)
+CC=gcc-13
 LIBEXT=.dylib
 else
 CC=gcc
-JAVAC=/usr/bin/javac
-JAVA=/usr/bin/java
-INCLUDE=/usr/lib/jvm/java-17-openjdk-amd64/include # this is for jni.h
-PYTHON3=/usr/bin/python3
 LIBEXT=.so
+INCLUDE=/usr/lib/jvm/java-17-openjdk-$(ARCH)/include # this is for jni.h
+INCLUDE2=-I/usr/lib/jvm/java-17-openjdk-$(ARCH)/include/linux # this is for jni_md.h
 endif
 
 CFLAGS=-Wall -Wextra -pedantic -std=c99 -shared -fpic
 
 java: libfraction
-	$(CC) $(CFLAGS) -I$(INCLUDE) -o java_ffi/libjava_ffi$(LIBEXT) java_ffi/java_ffi_FractionTester.c
-	$(JAVA) -Djava.library.path=$(PWD)/java_ffi java_ffi/FractionTester.java
+	$(CC) $(CFLAGS) -I$(INCLUDE) $(INCLUDE2) -o java_ffi/libjava_ffi$(LIBEXT) java_ffi/java_ffi_FractionTester.c
+	java -Djava.library.path=$(PWD)/java_ffi java_ffi/FractionTester.java
 
 python: libfraction
-	$(PYTHON3) python_ffi/fraction_tester.py
+	python3 python_ffi/fraction_tester.py
 
 go: libfraction
 	$(CC) $(CFLAGS) -o go_ffi/libgo_ffi$(LIBEXT) go_ffi/go_ffi.c
@@ -37,6 +39,7 @@ go: libfraction
 	# To build and run in one command:
 	go run go_ffi/fraction_tester.go go_ffi/cfuncs.go
 
+# Doesn't work yet
 nodejs: libfraction
 	npm --prefix nodejs_ffi/ install
 	npx tsc --strict nodejs_ffi/fraction_tester.ts
