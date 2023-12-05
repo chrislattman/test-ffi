@@ -1,6 +1,7 @@
 package main
 
 // The multi-line comment below is a cgo preamble
+
 /*
 // This links the code in go_ffi.c, which is compiled into a separate library
 // prior to building the Go project

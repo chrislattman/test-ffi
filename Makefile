@@ -19,15 +19,17 @@ PYTHON3=/usr/bin/python3
 LIBEXT=.so
 endif
 
+CFLAGS=-Wall -Wextra -pedantic -std=c99 -shared -fpic
+
 java: libfraction
-	$(CC) -shared -fpic -I$(INCLUDE) -o java_ffi/libjava_ffi$(LIBEXT) java_ffi/java_ffi_FractionTester.c
+	$(CC) $(CFLAGS) -I$(INCLUDE) -o java_ffi/libjava_ffi$(LIBEXT) java_ffi/java_ffi_FractionTester.c
 	$(JAVA) -Djava.library.path=$(PWD)/java_ffi java_ffi/FractionTester.java
 
 python: libfraction
 	$(PYTHON3) python_ffi/fraction_tester.py
 
 go: libfraction
-	$(CC) -shared -fpic -o go_ffi/libgo_ffi$(LIBEXT) go_ffi/go_ffi.c
+	$(CC) $(CFLAGS) -o go_ffi/libgo_ffi$(LIBEXT) go_ffi/go_ffi.c
 	# To build the executable separately:
 	# cd go_ffi; go build
 	# go_ffi/go_ffi
@@ -41,7 +43,7 @@ nodejs: libfraction
 	node nodejs_ffi/
 
 libfraction:
-	$(CC) -shared -fpic -o libfraction$(LIBEXT) libfraction.c
+	$(CC) $(CFLAGS) -o libfraction$(LIBEXT) libfraction.c
 
 clean:
 	rm -rf *$(LIBEXT) **/*$(LIBEXT) nodejs_ffi/*.js nodejs_ffi/build go_ffi/go_ffi

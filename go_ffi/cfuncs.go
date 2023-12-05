@@ -1,6 +1,7 @@
 package main
 
 // The multi-line comment below is a cgo preamble
+
 /*
 extern void go_print(const char *);
 
