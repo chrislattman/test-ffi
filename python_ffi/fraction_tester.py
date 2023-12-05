@@ -18,11 +18,11 @@ def py_print_func(arg_string_bytes: bytes):
 print_func = PRINT_FUNC_TYPE(py_print_func)
 
 # Load shared library and set argument types and return type
-libpath = f"{os.getcwd()}/libfraction"
+libpath = os.getcwd()
 if platform == "darwin":
-    libfraction = ctypes.CDLL(f"{libpath}.dylib")
+    libfraction = ctypes.CDLL(f"{libpath}/libfraction.dylib")
 else:
-    libfraction = ctypes.CDLL(f"{libpath}.so")
+    libfraction = ctypes.CDLL(f"{libpath}/libfraction.so")
 
 # Optional for our purposes, but necessary for variadic functions
 # libfraction.fraction_multiply.argtypes = [ctypes.POINTER(Fraction), ctypes.POINTER(Fraction)]
