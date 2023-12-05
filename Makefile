@@ -31,13 +31,15 @@ python: libfraction
 	python3 python_ffi/fraction_tester.py
 
 go: libfraction
+	rm go_ffi/go.mod
+	cd go_ffi; go mod init example.com/go_ffi/v2
 	$(CC) $(CFLAGS) -o go_ffi/libgo_ffi$(LIBEXT) go_ffi/go_ffi.c
 	# To build the executable separately:
-	# cd go_ffi; go build
-	# go_ffi/go_ffi
+	cd go_ffi; go build
+	go_ffi/go_ffi
 	#
-	# To build and run in one command:
-	go run go_ffi/fraction_tester.go go_ffi/cfuncs.go
+	# To build and run in one command (doesn't work on Linux):
+	# go run go_ffi/fraction_tester.go go_ffi/cfuncs.go
 
 # Doesn't work yet
 nodejs: libfraction

@@ -1,4 +1,5 @@
 import ctypes
+import os
 from sys import platform
 
 PRINT_FUNC_TYPE = ctypes.CFUNCTYPE(None, ctypes.c_char_p)
@@ -17,10 +18,11 @@ def py_print_func(arg_string_bytes: bytes):
 print_func = PRINT_FUNC_TYPE(py_print_func)
 
 # Load shared library and set argument types and return type
+libpath = f"{os.getcwd()}/libfraction"
 if platform == "darwin":
-    libfraction = ctypes.CDLL("libfraction.dylib")
+    libfraction = ctypes.CDLL(f"{libpath}.dylib")
 else:
-    libfraction = ctypes.CDLL("libfraction.so")
+    libfraction = ctypes.CDLL(f"{libpath}.so")
 
 # Optional for our purposes, but necessary for variadic functions
 # libfraction.fraction_multiply.argtypes = [ctypes.POINTER(Fraction), ctypes.POINTER(Fraction)]

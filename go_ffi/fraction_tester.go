@@ -37,7 +37,7 @@ func main() {
 
 	retval := C.frac_mult(&frac1, &frac2)
 	fmt.Printf("10/13 * 9/17 = %d/%d\n", frac1.numerator, frac1.denominator)
-	fmt.Println("Error code = ", retval)
+	fmt.Println("Error code =", retval)
 	C.free(unsafe.Pointer(frac1.str))
 	C.free(unsafe.Pointer(frac2.str))
 }
