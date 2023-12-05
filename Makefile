@@ -8,7 +8,7 @@ INCLUDE=/usr/local/Cellar/openjdk/21.0.1/include # this is for jni.h
 ARCH=amd64
 else
 INCLUDE=/opt/homebrew/opt/openjdk/include # this is for jni.h
-ARCH=aarch64
+ARCH=arm64
 endif
 
 ifneq ($(findstring Darwin,$(OS)),)
