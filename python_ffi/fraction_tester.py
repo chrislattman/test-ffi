@@ -12,7 +12,7 @@ class Fraction(ctypes.Structure):
                 ("print_func", PRINT_FUNC_TYPE)]
 
 # The string argument is received by py_print_func as encoded bytes
-def py_print_func(arg_string_bytes: bytes):
+def py_print_func(arg_string_bytes: bytes) -> None:
     print(arg_string_bytes.decode())
 
 print_func = PRINT_FUNC_TYPE(py_print_func)
