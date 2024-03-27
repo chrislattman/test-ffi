@@ -25,7 +25,9 @@ CFLAGS=-Wall -Wextra -pedantic -std=c99 -shared -fpic
 
 java: libfraction
 	$(CC) $(CFLAGS) -I$(INCLUDE) $(INCLUDE2) -o java_ffi/libjava_ffi$(LIBEXT) java_ffi/java_ffi_FractionTester.c
-	java -Djava.library.path=$(PWD)/java_ffi java_ffi/FractionTester.java
+	javac java_ffi/FractionTester.java
+	java -Djava.library.path=$(PWD)/java_ffi java_ffi/FractionTester
+	# java -Djava.library.path=$(PWD)/java_ffi java_ffi/FractionTester.java
 
 python: libfraction
 	python3 python_ffi/fraction_tester.py
@@ -49,4 +51,4 @@ libfraction:
 	$(CC) $(CFLAGS) -o libfraction$(LIBEXT) libfraction.c
 
 clean:
-	rm -rf *$(LIBEXT) **/*$(LIBEXT) go_ffi/go_ffi build
+	rm -rf *$(LIBEXT) **/*$(LIBEXT) go_ffi/go_ffi build java_ffi/*.class
