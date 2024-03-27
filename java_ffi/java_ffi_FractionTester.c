@@ -32,6 +32,8 @@ void frac2_print_func(const char *arg_str) {
 
 JNIEXPORT jint JNICALL Java_java_1ffi_FractionTester_fractionMultiply(
         JNIEnv *env, jobject thisObject, jobject frac1, jobject frac2) {
+    char libpath[200];
+    size_t dirlen;
     void *handle;
     int (*fraction_multiply)(Fraction *, Fraction *);
 
@@ -44,8 +46,6 @@ JNIEXPORT jint JNICALL Java_java_1ffi_FractionTester_fractionMultiply(
     const char *frac1Str, *frac2Str;
     Fraction f1, f2;
     int retval;
-    char libpath[200];
-    size_t dirlen;
 
     // Integer signature from https://docs.oracle.com/en/java/javase/21/docs/specs/jni/types.html#type-signatures
     const char *int_sig = "I";

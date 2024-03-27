@@ -9,5 +9,3 @@ Other times, a well-maintained library is only written in C/C++ and it's not wor
 This project demonstrates FFIs for Java, Python, Node.js, and Go. In this contrived example, they each call a multiply function from a fraction library (libfraction.c). That function prints out a provided string using a print function passed down from the high-level language, then returns the result of the fraction operation.
 
 Build and run the examples using the provided Makefile.
-
-Note: currently, the Node.js example doesn't work.

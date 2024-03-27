@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <stdio.h>
 
 /**
  * @brief Fraction data type
@@ -27,6 +28,7 @@ int fraction_multiply(Fraction *frac1, Fraction *frac2)
         frac1->denominator = denominator;
         frac1->print_func(frac1->str);
         frac2->print_func(frac2->str);
+        printf("Finished with calculation!\n");
         return 0;
     }
     return -1;

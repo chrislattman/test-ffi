@@ -2,7 +2,6 @@
 // This code (including struct fraction) could have been placed in the cgo
 // preamble in fraction_tester.go, but I chose to place it in a separate file
 #include <dlfcn.h>
-#include <stdio.h>
 #include <unistd.h>
 #include <string.h>
 #include "go_ffi.h"

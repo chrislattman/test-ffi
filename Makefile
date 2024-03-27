@@ -4,7 +4,7 @@ OS=$(shell echo `uname -a`)
 PWD=$(shell pwd)
 
 ifneq ($(findstring x86_64,$(OS)),)
-INCLUDE=/usr/local/Cellar/openjdk/21.0.1/include # this is for jni.h
+INCLUDE=/usr/local/Cellar/openjdk/21.0.2/include # this is for jni.h
 ARCH=amd64
 else
 INCLUDE=/opt/homebrew/opt/openjdk/include # this is for jni.h
@@ -41,14 +41,12 @@ go: libfraction
 	# To build and run in one command (doesn't work on Linux):
 	# go run go_ffi/fraction_tester.go go_ffi/cfuncs.go
 
-# Doesn't work yet
 nodejs: libfraction
-	npm --prefix nodejs_ffi/ install
-	npx tsc --strict nodejs_ffi/fraction_tester.ts
-	node nodejs_ffi/
+	npx node-gyp rebuild
+	npm start
 
 libfraction:
 	$(CC) $(CFLAGS) -o libfraction$(LIBEXT) libfraction.c
 
 clean:
-	rm -rf *$(LIBEXT) **/*$(LIBEXT) nodejs_ffi/*.js nodejs_ffi/build go_ffi/go_ffi
+	rm -rf *$(LIBEXT) **/*$(LIBEXT) go_ffi/go_ffi build

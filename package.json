@@ -1,0 +1,13 @@
+{
+  "name": "node_ffi",
+  "scripts": {
+    "start": "npx tsx nodejs_ffi/fraction_tester.ts"
+  },
+  "gypfile": true,
+  "dependencies": {
+    "bindings": "^1.5.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.30"
+  }
+}
