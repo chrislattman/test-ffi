@@ -4,16 +4,21 @@
 #include <dlfcn.h>
 #include <unistd.h>
 #include <string.h>
+#include <stdlib.h>
 #include "go_ffi.h"
 
 int frac_mult(Fraction *f1, Fraction *f2) {
     void *handle;
     int (*fraction_multiply)(Fraction *, Fraction *);
     int retval;
-    char libpath[200];
+    char *libpath = NULL;
     size_t dirlen;
 
-    getcwd(libpath, sizeof(libpath) - 1);
+    // uses malloc to allocate a buffer with exactly the right size
+    libpath = getcwd(NULL, 0);
+    if (libpath == NULL) {
+        return -1;
+    }
     dirlen = strlen(libpath);
 #ifdef __APPLE__
     strncat(libpath + dirlen, "/libfraction.dylib", sizeof(libpath) - dirlen - 1);
@@ -25,5 +30,6 @@ int frac_mult(Fraction *f1, Fraction *f2) {
 
     retval = fraction_multiply(f1, f2);
     dlclose(handle);
+    free(libpath);
     return retval;
 }

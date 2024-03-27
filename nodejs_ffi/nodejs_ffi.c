@@ -33,7 +33,7 @@ static napi_value nodejs_fraction_multiply(napi_env env, napi_callback_info info
     size_t argc = 2;
     napi_value args[2], global;
 
-    char libpath[200];
+    char *libpath = NULL;
     size_t dirlen;
     void *handle;
     int (*fraction_multiply)(Fraction *, Fraction *);
@@ -58,8 +58,14 @@ static napi_value nodejs_fraction_multiply(napi_env env, napi_callback_info info
     frac1 = args[0];
     frac2 = args[1];
 
+    napi_create_int32(env, -1, &result);
+
     // Retrieve function symbol
-    getcwd(libpath, sizeof(libpath) - 1);
+    // uses malloc to allocate a buffer with exactly the right size
+    libpath = getcwd(NULL, 0);
+    if (libpath == NULL) {
+        goto cleanup;
+    }
     dirlen = strlen(libpath);
 #ifdef __APPLE__
     strncat(libpath + dirlen, "/libfraction.dylib", sizeof(libpath) - dirlen - 1);
@@ -89,14 +95,12 @@ static napi_value nodejs_fraction_multiply(napi_env env, napi_callback_info info
     napi_get_value_string_utf8(env, frac1_str_napi, NULL, 0, &str_length);
     frac1_str = calloc(str_length + 1, sizeof(char));
     if (frac1_str == NULL) {
-        napi_create_int32(env, -1, &result);
         goto cleanup;
     }
     napi_get_value_string_utf8(env, frac1_str_napi, frac1_str, str_length + 1, &str_length);
     napi_get_value_string_utf8(env, frac2_str_napi, NULL, 0, &str_length);
     frac2_str = calloc(str_length + 1, sizeof(char));
     if (frac2_str == NULL) {
-        napi_create_int32(env, -1, &result);
         goto cleanup;
     }
     napi_get_value_string_utf8(env, frac2_str_napi, frac2_str, str_length + 1, &str_length);
@@ -134,6 +138,9 @@ cleanup:
         free(frac2_str);
     }
     dlclose(handle);
+    if (libpath != NULL) {
+        free(libpath);
+    }
     return result;
 }
 
