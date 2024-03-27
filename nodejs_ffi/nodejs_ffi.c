@@ -33,7 +33,8 @@ static napi_value nodejs_fraction_multiply(napi_env env, napi_callback_info info
     size_t argc = 2;
     napi_value args[2], global;
 
-    char *libpath = NULL;
+    char *cwd = NULL, *libpath = NULL;
+    const char *libname;
     size_t dirlen;
     void *handle;
     int (*fraction_multiply)(Fraction *, Fraction *);
@@ -62,16 +63,22 @@ static napi_value nodejs_fraction_multiply(napi_env env, napi_callback_info info
 
     // Retrieve function symbol
     // uses malloc to allocate a buffer with exactly the right size
-    libpath = getcwd(NULL, 0);
+    cwd = getcwd(NULL, 0);
+    if (cwd == NULL) {
+        goto cleanup;
+    }
+    dirlen = strlen(cwd);
+#ifdef __APPLE__
+    libname = "/libfraction.dylib";
+#else
+    libname = "/libfraction.so";
+#endif
+    libpath = calloc(dirlen + strlen(libname), sizeof(char));
     if (libpath == NULL) {
         goto cleanup;
     }
-    dirlen = strlen(libpath);
-#ifdef __APPLE__
-    strncat(libpath + dirlen, "/libfraction.dylib", sizeof(libpath) - dirlen - 1);
-#else
-    strncat(libpath + dirlen, "/libfraction.so", sizeof(libpath) - dirlen - 1);
-#endif
+    strcat(libpath, cwd);
+    strcat(libpath + dirlen, libname);
     handle = dlopen(libpath, RTLD_NOW);
     *(void **)(&fraction_multiply) = dlsym(handle, "fraction_multiply");
 
@@ -140,6 +147,9 @@ cleanup:
     dlclose(handle);
     if (libpath != NULL) {
         free(libpath);
+    }
+    if (cwd != NULL) {
+        free(cwd);
     }
     return result;
 }

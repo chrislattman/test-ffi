@@ -33,7 +33,8 @@ void frac2_print_func(const char *arg_str) {
 
 JNIEXPORT jint JNICALL Java_java_1ffi_FractionTester_fractionMultiply(
         JNIEnv *env, jobject thisObject, jobject frac1, jobject frac2) {
-    char *libpath = NULL;
+    char *cwd = NULL, *libpath = NULL;
+    const char *libname;
     size_t dirlen;
     void *handle;
     int (*fraction_multiply)(Fraction *, Fraction *);
@@ -59,16 +60,23 @@ JNIEXPORT jint JNICALL Java_java_1ffi_FractionTester_fractionMultiply(
 
     // Retrieve function symbol
     // uses malloc to allocate a buffer with exactly the right size
-    libpath = getcwd(NULL, 0);
-    if (libpath == NULL) {
+    cwd = getcwd(NULL, 0);
+    if (cwd == NULL) {
         return -1;
     }
-    dirlen = strlen(libpath);
+    dirlen = strlen(cwd);
 #ifdef __APPLE__
-    strncat(libpath + dirlen, "/libfraction.dylib", sizeof(libpath) - dirlen - 1);
+    libname = "/libfraction.dylib";
 #else
-    strncat(libpath + dirlen, "/libfraction.so", sizeof(libpath) - dirlen - 1);
+    libname = "/libfraction.so";
 #endif
+    libpath = calloc(dirlen + strlen(libname), sizeof(char));
+    if (libpath == NULL) {
+        free(cwd);
+        return -1;
+    }
+    strcat(libpath, cwd);
+    strcat(libpath + dirlen, libname);
     handle = dlopen(libpath, RTLD_NOW);
     *(void **)(&fraction_multiply) = dlsym(handle, "fraction_multiply");
 
@@ -127,5 +135,6 @@ JNIEXPORT jint JNICALL Java_java_1ffi_FractionTester_fractionMultiply(
     // Close file and return error code
     dlclose(handle);
     free(libpath);
+    free(cwd);
     return retval;
 }
