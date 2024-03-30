@@ -32,6 +32,10 @@ java: libfraction
 python: libfraction
 	python3 python_ffi/fraction_tester.py
 
+nodejs: libfraction
+	npx node-gyp rebuild
+	npm start
+
 go: libfraction
 	rm go_ffi/go.mod
 	cd go_ffi; go mod init example.com/go_ffi/v2
@@ -42,10 +46,6 @@ go: libfraction
 	#
 	# To build and run in one command (doesn't work on Linux):
 	# go run go_ffi/fraction_tester.go go_ffi/cfuncs.go
-
-nodejs: libfraction
-	npx node-gyp rebuild
-	npm start
 
 libfraction:
 	$(CC) $(CFLAGS) -o libfraction$(LIBEXT) libfraction.c

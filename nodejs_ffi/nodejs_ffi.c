@@ -36,7 +36,7 @@ static napi_value nodejs_fraction_multiply(napi_env env, napi_callback_info info
     char *cwd = NULL, *libpath = NULL;
     const char *libname;
     size_t dirlen;
-    void *handle;
+    void *handle = NULL;
     int (*fraction_multiply)(Fraction *, Fraction *);
 
     napi_value frac1, frac1_numerator_napi, frac1_denominator_napi, frac1_str_napi, frac1_print_func_napi;
@@ -144,7 +144,9 @@ cleanup:
     if (frac2_str != NULL) {
         free(frac2_str);
     }
-    dlclose(handle);
+    if (handle != NULL) {
+        dlclose(handle);
+    }
     if (libpath != NULL) {
         free(libpath);
     }

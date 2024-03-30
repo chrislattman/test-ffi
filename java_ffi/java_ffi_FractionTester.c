@@ -32,7 +32,7 @@ void frac2_print_func(const char *arg_str) {
 }
 
 JNIEXPORT jint JNICALL Java_java_1ffi_FractionTester_fractionMultiply(
-        JNIEnv *env, jobject thisObject, jobject frac1, jobject frac2) {
+        JNIEnv *env, __attribute__((unused)) jobject thisObject, jobject frac1, jobject frac2) {
     char *cwd = NULL, *libpath = NULL;
     const char *libname;
     size_t dirlen;
