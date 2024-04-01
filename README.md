@@ -10,4 +10,4 @@ This project demonstrates FFIs for Java, Python, Node.js, and Go. In this contri
 
 Build and run the examples using the provided Makefile.
 
-Note: C and C++ are not the only languages that can be called by high-level languages. Go and Rust support exporting code in library format. This repository contains experimental support for calling libfraction.go functions.
+Note: C and C++ are not the only languages that can be called by high-level languages. Go and Rust support exporting code in library format. This repository contains experimental support for calling Go functions in libfraction.go.
