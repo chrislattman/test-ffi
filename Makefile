@@ -50,5 +50,9 @@ go: libfraction
 libfraction:
 	$(CC) $(CFLAGS) -o libfraction$(LIBEXT) libfraction.c
 
+libfraction_go:
+	go build -buildmode=c-shared -o libfraction$(LIBEXT) libfraction.go
+	rm libfraction.h
+
 clean:
 	rm -rf *$(LIBEXT) **/*$(LIBEXT) go_ffi/go_ffi build java_ffi/*.class
