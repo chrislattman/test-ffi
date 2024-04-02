@@ -43,7 +43,6 @@ JNIEXPORT jint JNICALL Java_java_1ffi_FractionTester_fractionMultiply(
     jfieldID frac1NumeratorID, frac2NumeratorID, frac1DenominatorID, frac2DenominatorID, frac1StrID, frac2StrID;
     jint frac1Numerator, frac2Numerator, frac1Denominator, frac2Denominator;
     jobject frac1StrObj, frac2StrObj;
-    jboolean frac1StrIsCopy, frac2StrIsCopy; // not used
 
     const char *frac1Str, *frac2Str;
     Fraction f1, f2;
@@ -101,9 +100,9 @@ JNIEXPORT jint JNICALL Java_java_1ffi_FractionTester_fractionMultiply(
 
     // Extracts the strings from the Fraction jobjects
     frac1StrObj = (*env)->GetObjectField(env, frac1, frac1StrID);
-    frac1Str = (*env)->GetStringUTFChars(env, frac1StrObj, &frac1StrIsCopy);
+    frac1Str = (*env)->GetStringUTFChars(env, frac1StrObj, NULL);
     frac2StrObj = (*env)->GetObjectField(env, frac2, frac2StrID);
-    frac2Str = (*env)->GetStringUTFChars(env, frac2StrObj, &frac2StrIsCopy);
+    frac2Str = (*env)->GetStringUTFChars(env, frac2StrObj, NULL);
 
     // Obtains the method IDs of the Java callback functions and sets
     // global variables used by callback functions
