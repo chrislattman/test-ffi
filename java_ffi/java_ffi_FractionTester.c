@@ -132,7 +132,9 @@ JNIEXPORT jint JNICALL Java_java_1ffi_FractionTester_fractionMultiply(
     (*env)->SetIntField(env, frac1, frac1NumeratorID, f1.numerator);
     (*env)->SetIntField(env, frac1, frac1DenominatorID, f1.denominator);
 
-    // Close file and return error code
+    // Free strings, close file and return error code
+    (*env)->ReleaseStringUTFChars(env, frac1StrObj, frac1Str);
+    (*env)->ReleaseStringUTFChars(env, frac2StrObj, frac2Str);
     dlclose(handle);
     free(libpath);
     free(cwd);
