@@ -23,8 +23,10 @@ endif
 
 CFLAGS=-Wall -Wextra -pedantic -std=c99 -shared -fpic
 
-ifeq ($(GO_LIB),1)
+ifeq ($(LIB_GO),1)
 LIB=libfraction_go
+else ifeq ($(LIB_RUST),1)
+LIB=libfraction_rust
 else
 LIB=libfraction
 endif
@@ -43,15 +45,13 @@ nodejs: $(LIB)
 	npm start
 
 go: $(LIB)
-	rm go_ffi/go.mod
-	cd go_ffi; go mod init example.com/go_ffi/v2
 	$(CC) $(CFLAGS) -o go_ffi/libgo_ffi$(LIBEXT) go_ffi/go_ffi.c
-	# To build the executable separately:
 	cd go_ffi; go build
 	go_ffi/go_ffi
-	#
-	# To build and run in one command (doesn't work on Linux):
 	# go run go_ffi/fraction_tester.go go_ffi/cfuncs.go
+
+rust: $(LIB)
+	cargo run
 
 libfraction:
 	$(CC) $(CFLAGS) -o libfraction$(LIBEXT) libfraction.c
@@ -60,8 +60,11 @@ libfraction_go:
 	go build -buildmode=c-shared -o libfraction$(LIBEXT) libfraction.go
 	rm libfraction.h
 
+libfraction_rust:
+	rustc --crate-type=cdylib -o libfraction$(LIBEXT) libfraction.rs
+
 clean:
-	rm -rf *$(LIBEXT) **/*$(LIBEXT) go_ffi/go_ffi build java_ffi/*.class
+	rm -rf *$(LIBEXT) **/*$(LIBEXT) go_ffi/go_ffi build java_ffi/*.class target
 
 help:
-	@echo "To use the Go fraction library add GO_LIB=1, e.g. make python GO_LIB=1"
+	@echo "To use the Go fraction library add LIB_GO=1, e.g. make python LIB_GO=1"
