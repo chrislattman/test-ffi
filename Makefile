@@ -51,7 +51,11 @@ go: $(LIB)
 	# go run go_ffi/fraction_tester.go go_ffi/cfuncs.go
 
 rust: $(LIB)
+ifneq ($(findstring Darwin,$(OS)),)
 	RUSTFLAGS="-L." cargo run
+else
+	RUSTFLAGS="-L. -C link-args=-Wl,-rpath=$(PWD)" cargo run
+endif
 
 libfraction:
 	$(CC) $(CFLAGS) -o libfraction$(LIBEXT) libfraction.c
