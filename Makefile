@@ -51,7 +51,7 @@ go: $(LIB)
 	# go run go_ffi/fraction_tester.go go_ffi/cfuncs.go
 
 rust: $(LIB)
-	cargo run
+	RUSTFLAGS="-L." cargo run
 
 libfraction:
 	$(CC) $(CFLAGS) -o libfraction$(LIBEXT) libfraction.c

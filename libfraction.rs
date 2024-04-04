@@ -1,11 +1,11 @@
-type PrintFuncT = fn(String);
+use std::ffi::{c_char, c_int};
 
 #[repr(C)]
 pub struct Fraction {
-    numerator: i32,
-    denominator: i32,
-    frac_str: String,
-    print_func: PrintFuncT,
+    numerator: c_int,
+    denominator: c_int,
+    frac_str: *const c_char,
+    print_func: fn(*const c_char),
 }
 
 #[no_mangle]
@@ -16,8 +16,8 @@ pub extern "C" fn fraction_multiply(frac1: *mut Fraction, frac2: *mut Fraction) 
             let denominator = (*frac1).denominator * (*frac2).denominator;
             (*frac1).numerator = numerator;
             (*frac1).denominator = denominator;
-            // ((*frac1).print_func)((*frac1).frac_str);
-            // ((*frac2).print_func)((*frac2).frac_str);
+            ((*frac1).print_func)((*frac1).frac_str);
+            ((*frac2).print_func)((*frac2).frac_str);
             println!("Finished with calculation!");
             return 0;
         }
