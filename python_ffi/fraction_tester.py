@@ -4,16 +4,21 @@ from sys import platform
 
 PRINT_FUNC_TYPE = ctypes.CFUNCTYPE(None, ctypes.c_char_p)
 
+
 # Mimics the structure in libfraction.c
 class Fraction(ctypes.Structure):
-    _fields_ = [("numerator", ctypes.c_int),
-                ("denominator", ctypes.c_int),
-                ("str", ctypes.c_char_p),
-                ("print_func", PRINT_FUNC_TYPE)]
+    _fields_ = [
+        ("numerator", ctypes.c_int),
+        ("denominator", ctypes.c_int),
+        ("str", ctypes.c_char_p),
+        ("print_func", PRINT_FUNC_TYPE),
+    ]
+
 
 # The string argument is received by py_print_func as encoded bytes
 def py_print_func(arg_string_bytes: bytes) -> None:
     print(arg_string_bytes.decode())
+
 
 print_func = PRINT_FUNC_TYPE(py_print_func)
 
