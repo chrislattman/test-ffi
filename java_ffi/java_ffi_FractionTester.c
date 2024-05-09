@@ -33,7 +33,7 @@ void frac2_print_func(const char *arg_str) {
 
 JNIEXPORT jint JNICALL Java_java_1ffi_FractionTester_fractionMultiply(
         JNIEnv *env, __attribute__((unused)) jobject thisObject, jobject frac1, jobject frac2) {
-    char *cwd = NULL, *libpath = NULL;
+    const char *cwd = NULL, *libpath = NULL;
     const char *libname;
     size_t dirlen;
     void *handle;
@@ -49,13 +49,13 @@ JNIEXPORT jint JNICALL Java_java_1ffi_FractionTester_fractionMultiply(
     int retval;
 
     // Integer signature from https://docs.oracle.com/en/java/javase/21/docs/specs/jni/types.html#type-signatures
-    const char *int_sig = "I";
+    const char * const int_sig = "I";
 
     // String signature from https://docs.oracle.com/en/java/javase/21/docs/specs/jni/types.html#type-signatures
-    const char *str_sig = "Ljava/lang/String;";
+    const char * const str_sig = "Ljava/lang/String;";
 
     // Function pointer signature (V means void return type)
-    const char *func_ptr_sig = "(Ljava/lang/String;)V";
+    const char * const func_ptr_sig = "(Ljava/lang/String;)V";
 
     // Retrieve function symbol
     // uses malloc to allocate a buffer with exactly the right size

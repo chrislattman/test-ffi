@@ -33,7 +33,7 @@ static napi_value nodejs_fraction_multiply(napi_env env, napi_callback_info info
     size_t argc = 2;
     napi_value args[2], global;
 
-    char *cwd = NULL, *libpath = NULL;
+    const char *cwd = NULL, *libpath = NULL;
     const char *libname;
     size_t dirlen;
     void *handle = NULL;
