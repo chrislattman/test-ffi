@@ -49,13 +49,13 @@ JNIEXPORT jint JNICALL Java_java_1ffi_FractionTester_fractionMultiply(
     int retval;
 
     // Integer signature from https://docs.oracle.com/en/java/javase/21/docs/specs/jni/types.html#type-signatures
-    const char * const int_sig = "I";
+    const char *int_sig = "I";
 
     // String signature from https://docs.oracle.com/en/java/javase/21/docs/specs/jni/types.html#type-signatures
-    const char * const str_sig = "Ljava/lang/String;";
+    const char *str_sig = "Ljava/lang/String;";
 
     // Function pointer signature (V means void return type)
-    const char * const func_ptr_sig = "(Ljava/lang/String;)V";
+    const char *func_ptr_sig = "(Ljava/lang/String;)V";
 
     // Retrieve function symbol
     // uses malloc to allocate a buffer with exactly the right size
