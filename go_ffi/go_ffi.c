@@ -2,9 +2,10 @@
 // This code (including struct fraction) could have been placed in the cgo
 // preamble in fraction_tester.go, but I chose to place it in a separate file
 #include <dlfcn.h>
-#include <unistd.h>
-#include <string.h>
 #include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
+
 #include "go_ffi.h"
 
 int frac_mult(Fraction *f1, Fraction *f2) {

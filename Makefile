@@ -4,7 +4,7 @@ OS=$(shell echo `uname -a`)
 PWD=$(shell pwd)
 
 ifneq ($(findstring x86_64,$(OS)),)
-INCLUDE=/usr/local/Cellar/openjdk/21.0.2/include # this is for jni.h
+INCLUDE=/usr/local/Cellar/openjdk/21.0.3/include # this is for jni.h
 ARCH=amd64
 else
 INCLUDE=/opt/homebrew/opt/openjdk/include # this is for jni.h
@@ -12,7 +12,7 @@ ARCH=arm64
 endif
 
 ifneq ($(findstring Darwin,$(OS)),)
-CC=gcc-13
+CC=gcc-14
 LIBEXT=.dylib
 else
 CC=gcc

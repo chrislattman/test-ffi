@@ -1,9 +1,10 @@
 // This is the "glue code" that loads the libfraction shared library
-#include <node_api.h>
 #include <dlfcn.h>
-#include <unistd.h>
-#include <string.h>
 #include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
+
+#include <node_api.h>
 
 static napi_env g_env;
 static napi_value g_global, g_frac1_print_func_napi, g_frac2_print_func_napi;
@@ -15,14 +16,14 @@ typedef struct fraction {
     void (*print_func)(const char *);
 } Fraction;
 
-void frac1_print_func(const char *arg_str) {
+static void frac1_print_func(const char *arg_str) {
     napi_value str_napi, result;
 
     napi_create_string_utf8(g_env, arg_str, strlen(arg_str), &str_napi);
     napi_call_function(g_env, g_global, g_frac1_print_func_napi, 1, &str_napi, &result);
 }
 
-void frac2_print_func(const char *arg_str) {
+static void frac2_print_func(const char *arg_str) {
     napi_value str_napi, result;
 
     napi_create_string_utf8(g_env, arg_str, strlen(arg_str), &str_napi);
@@ -33,7 +34,7 @@ static napi_value nodejs_fraction_multiply(napi_env env, napi_callback_info info
     size_t argc = 2;
     napi_value args[2], global;
 
-    const char *cwd = NULL, *libpath = NULL;
+    char *cwd = NULL, *libpath = NULL;
     const char *libname;
     size_t dirlen;
     void *handle = NULL;
