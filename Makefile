@@ -4,7 +4,7 @@ OS=$(shell echo `uname -a`)
 PWD=$(shell pwd)
 
 ifneq ($(findstring x86_64,$(OS)),)
-INCLUDE=/usr/local/Cellar/openjdk/21.0.3/include # this is for jni.h
+INCLUDE=/usr/local/Cellar/openjdk/22.0.1/include # this is for jni.h
 ARCH=amd64
 else
 INCLUDE=/opt/homebrew/opt/openjdk/include # this is for jni.h
@@ -41,7 +41,7 @@ python: $(LIB)
 	python3 python_ffi/fraction_tester.py
 
 nodejs: $(LIB)
-	npx node-gyp rebuild
+	npx node-gyp rebuild --loglevel silent
 	npm start
 
 go: $(LIB)
@@ -52,9 +52,9 @@ go: $(LIB)
 
 rust: $(LIB)
 ifneq ($(findstring Darwin,$(OS)),)
-	RUSTFLAGS="-L." cargo run
+	RUSTFLAGS="-L." cargo run -q
 else
-	RUSTFLAGS="-L. -C link-args=-Wl,-rpath=$(PWD)" cargo run
+	RUSTFLAGS="-L. -C link-args=-Wl,-rpath=$(PWD)" cargo run -q
 endif
 
 libfraction:
