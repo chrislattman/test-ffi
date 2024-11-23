@@ -57,7 +57,7 @@ else
 	RUSTFLAGS="-L. -C link-args=-Wl,-rpath=$(PWD)" cargo run -q
 endif
 
-webassembly: $(LIB)
+webassembly:
 	# Compiling libfraction.c with wasm_ffi.c since web browsers cannot run ELF binaries
 	cd webassembly_ffi; emcc -sEXPORTED_RUNTIME_METHODS=["cwrap"] wasm_ffi.c ../libfraction.c; python3 -m http.server
 
