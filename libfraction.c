@@ -1,4 +1,3 @@
-#include <stdlib.h>
 #include <stdio.h>
 
 /**
@@ -19,8 +18,7 @@ typedef struct fraction {
  * @param frac2
  * @return 0 on success, -1 on failure
  */
-int fraction_multiply(Fraction *frac1, Fraction *frac2)
-{
+int fraction_multiply(Fraction *frac1, Fraction *frac2) {
     if (frac1 != NULL && frac2 != NULL) {
         int numerator = frac1->numerator * frac2->numerator;
         int denominator = frac1->denominator * frac2->denominator;

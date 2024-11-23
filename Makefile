@@ -4,7 +4,7 @@ OS=$(shell echo `uname -a`)
 PWD=$(shell pwd)
 
 ifneq ($(findstring x86_64,$(OS)),)
-INCLUDE=/usr/local/Cellar/openjdk/22.0.1/include # this is for jni.h
+INCLUDE=/usr/local/Cellar/openjdk/23.0.1/include # this is for jni.h
 ARCH=amd64
 else
 INCLUDE=/opt/homebrew/opt/openjdk/include # this is for jni.h
@@ -17,8 +17,8 @@ LIBEXT=.dylib
 else
 CC=gcc
 LIBEXT=.so
-INCLUDE=/usr/lib/jvm/java-17-openjdk-$(ARCH)/include # this is for jni.h
-INCLUDE2=-I/usr/lib/jvm/java-17-openjdk-$(ARCH)/include/linux # this is for jni_md.h
+INCLUDE=/usr/lib/jvm/java-21-openjdk-$(ARCH)/include # this is for jni.h
+INCLUDE2=-I/usr/lib/jvm/java-21-openjdk-$(ARCH)/include/linux # this is for jni_md.h
 endif
 
 CFLAGS=-Wall -Wextra -pedantic -std=c99 -shared -fpic
@@ -57,6 +57,10 @@ else
 	RUSTFLAGS="-L. -C link-args=-Wl,-rpath=$(PWD)" cargo run -q
 endif
 
+webassembly: $(LIB)
+	# Compiling libfraction.c with wasm_ffi.c since web browsers cannot run ELF binaries
+	cd webassembly_ffi; emcc -sEXPORTED_RUNTIME_METHODS=["cwrap"] wasm_ffi.c ../libfraction.c; python3 -m http.server
+
 libfraction:
 	$(CC) $(CFLAGS) -o libfraction$(LIBEXT) libfraction.c
 
@@ -68,7 +72,7 @@ libfraction_rust:
 	rustc --crate-type=cdylib -o libfraction$(LIBEXT) libfraction.rs
 
 clean:
-	rm -rf *$(LIBEXT) **/*$(LIBEXT) go_ffi/go_ffi build java_ffi/*.class target
+	rm -rf *$(LIBEXT) **/*$(LIBEXT) go_ffi/go_ffi build java_ffi/*.class target webassembly_ffi/a.out*
 
 help:
 	@echo "To use the Go fraction library add LIB_GO=1, e.g. make python LIB_GO=1"

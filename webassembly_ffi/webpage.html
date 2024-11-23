@@ -1,0 +1,29 @@
+<script src="./a.out.js"></script>
+<script>
+    class Fraction {
+        numerator;
+        denominator;
+        str;
+
+        constructor(numerator, denominator, str, print_func) {
+            this.numerator = numerator;
+            this.denominator = denominator;
+            this.str = str;
+        }
+    }
+
+    Module.js_print = function(arg_string) {
+        console.log(arg_string);
+    }
+
+    const frac1 = new Fraction(10, 13, "Hello");
+    const frac2 = new Fraction(9, 17, "World!");
+
+    Module.onRuntimeInitialized = async () => {
+        const api = {
+            frac_mult: Module.cwrap("frac_mult", "number", ["number", "number", "string", "number", "number", "string"]),
+        };
+        const retval = api.frac_mult(frac1.numerator, frac1.denominator, frac1.str, frac2.numerator, frac2.denominator, frac2.str);
+        console.log(`Error code = ${retval}`);
+    };
+</script>

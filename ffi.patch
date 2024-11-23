@@ -1,0 +1,179 @@
+diff --git a/.gitignore b/.gitignore
+index 8fffc09..9ca7d7e 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -7,3 +7,4 @@ build/
+ .DS_Store
+ go_ffi/go_ffi
+ target/
++a.out*
+diff --git a/Makefile b/Makefile
+index 4dd4cd6..ae44778 100644
+--- a/Makefile
++++ b/Makefile
+@@ -4,7 +4,7 @@ OS=$(shell echo `uname -a`)
+ PWD=$(shell pwd)
+ 
+ ifneq ($(findstring x86_64,$(OS)),)
+-INCLUDE=/usr/local/Cellar/openjdk/22.0.1/include # this is for jni.h
++INCLUDE=/usr/local/Cellar/openjdk/23.0.1/include # this is for jni.h
+ ARCH=amd64
+ else
+ INCLUDE=/opt/homebrew/opt/openjdk/include # this is for jni.h
+@@ -17,8 +17,8 @@ LIBEXT=.dylib
+ else
+ CC=gcc
+ LIBEXT=.so
+-INCLUDE=/usr/lib/jvm/java-17-openjdk-$(ARCH)/include # this is for jni.h
+-INCLUDE2=-I/usr/lib/jvm/java-17-openjdk-$(ARCH)/include/linux # this is for jni_md.h
++INCLUDE=/usr/lib/jvm/java-21-openjdk-$(ARCH)/include # this is for jni.h
++INCLUDE2=-I/usr/lib/jvm/java-21-openjdk-$(ARCH)/include/linux # this is for jni_md.h
+ endif
+ 
+ CFLAGS=-Wall -Wextra -pedantic -std=c99 -shared -fpic
+@@ -57,6 +57,10 @@ else
+ 	RUSTFLAGS="-L. -C link-args=-Wl,-rpath=$(PWD)" cargo run -q
+ endif
+ 
++webassembly: $(LIB)
++	# Compiling libfraction.c with wasm_ffi.c since web browsers cannot run ELF binaries
++	cd webassembly_ffi; emcc -sEXPORTED_RUNTIME_METHODS=["cwrap"] wasm_ffi.c ../libfraction.c; python3 -m http.server
++
+ libfraction:
+ 	$(CC) $(CFLAGS) -o libfraction$(LIBEXT) libfraction.c
+ 
+@@ -68,7 +72,7 @@ libfraction_rust:
+ 	rustc --crate-type=cdylib -o libfraction$(LIBEXT) libfraction.rs
+ 
+ clean:
+-	rm -rf *$(LIBEXT) **/*$(LIBEXT) go_ffi/go_ffi build java_ffi/*.class target
++	rm -rf *$(LIBEXT) **/*$(LIBEXT) go_ffi/go_ffi build java_ffi/*.class target webassembly_ffi/a.out*
+ 
+ help:
+ 	@echo "To use the Go fraction library add LIB_GO=1, e.g. make python LIB_GO=1"
+diff --git a/README.md b/README.md
+index f685633..4a6a348 100644
+--- a/README.md
++++ b/README.md
+@@ -4,8 +4,10 @@ Foreign function interfaces (FFIs) are ways for programs written in a high-level
+ 
+ This is often needed for performance requirements, where a Java/Python/Node.js/Ruby/PHP project needs to run some specific functions super efficiently, closer to the CPU level than the high-level languages offer. Other times, a well-maintained library is only written in C/C++ and it's not worth the effort to rewrite that library in a high-level language.
+ 
+-This project demonstrates FFIs for Java, Python, Node.js, Go, and Rust. In this contrived example, they each call a multiply function from a fraction library (libfraction.c). That function prints out a provided string using a print function passed down from the high-level language, then returns the result of the fraction operation.
++This project demonstrates FFIs for Java, Python, Node.js, Go, Rust, and WebAssembly (wasm). In this contrived example, they each call a multiply function from a fraction library (libfraction.c). That function prints out a provided string using a print function passed down from the high-level language, then returns the result of the fraction operation.
+ 
+ Build and run the examples using the provided Makefile.
+ 
+ Note: C and C++ are not the only languages that can be called by high-level languages. Go and Rust support exporting code in library format. This repository contains support for calling functions from libfraction.go and libfraction.rs.
++
++For the WebAssembly example, the print function isn't passed down, but it's made available as a module function. To view the results, open http://localhost:8000/webpage.html in a web browser, right click and inspect the page (opens DevTools), and open the console. Then refresh the page.
+diff --git a/libfraction.c b/libfraction.c
+index 8312006..776ee29 100644
+--- a/libfraction.c
++++ b/libfraction.c
+@@ -1,4 +1,3 @@
+-#include <stdlib.h>
+ #include <stdio.h>
+ 
+ /**
+@@ -19,8 +18,7 @@ typedef struct fraction {
+  * @param frac2
+  * @return 0 on success, -1 on failure
+  */
+-int fraction_multiply(Fraction *frac1, Fraction *frac2)
+-{
++int fraction_multiply(Fraction *frac1, Fraction *frac2) {
+     if (frac1 != NULL && frac2 != NULL) {
+         int numerator = frac1->numerator * frac2->numerator;
+         int denominator = frac1->denominator * frac2->denominator;
+diff --git a/nodejs_ffi/fraction_tester.ts b/nodejs_ffi/fraction_tester.ts
+index 24bf3c3..8bdb901 100644
+--- a/nodejs_ffi/fraction_tester.ts
++++ b/nodejs_ffi/fraction_tester.ts
+@@ -18,7 +18,7 @@ function nodejs_print(arg_string: string): void {
+     console.log(arg_string);
+ }
+ 
+-const frac1 = new Fraction(10, 13, "Hello", nodejs_print);
++let frac1 = new Fraction(10, 13, "Hello", nodejs_print);
+ const frac2 = new Fraction(9, 17, "World!", nodejs_print);
+ const retval = nodejs_ffi.nodejs_fraction_multiply(frac1, frac2);
+ console.log(`10/13 * 9/17 = ${frac1.numerator}/${frac1.denominator}`);
+diff --git a/webassembly_ffi/wasm_ffi.c b/webassembly_ffi/wasm_ffi.c
+new file mode 100644
+index 0000000..be75abe
+--- /dev/null
++++ b/webassembly_ffi/wasm_ffi.c
+@@ -0,0 +1,37 @@
++// This "glue code" is needed because WebAssembly code cannot access the file system,
++// since the code is running in a sandboxed web browser environment
++#include <emscripten/emscripten.h>
++
++// Mimics the structure in libfraction.c
++typedef struct fraction {
++    int numerator, denominator;
++    const char *str;
++    void (*print_func)(const char *);
++} Fraction;
++
++int fraction_multiply(Fraction *frac1, Fraction *frac2);
++
++EM_JS(void, js_print_function, (const char *arg), {
++    Module.js_print(UTF8ToString(arg));
++});
++
++EMSCRIPTEN_KEEPALIVE int frac_mult(int frac1Numerator, int frac1Denominator, const char *frac1Str, 
++        int frac2Numerator, int frac2Denominator, const char *frac2Str) {
++    Fraction f1, f2;
++    int retval;
++
++    f1 = (Fraction) {
++        .numerator = frac1Numerator,
++        .denominator = frac1Denominator,
++        .str = frac1Str,
++        .print_func = js_print_function
++    };
++    f2 = (Fraction) {
++        .numerator = frac2Numerator,
++        .denominator = frac2Denominator,
++        .str = frac2Str,
++        .print_func = js_print_function
++    };
++    retval = fraction_multiply(&f1, &f2);
++    return retval;
++}
+diff --git a/webassembly_ffi/webpage.html b/webassembly_ffi/webpage.html
+new file mode 100644
+index 0000000..37ed6ab
+--- /dev/null
++++ b/webassembly_ffi/webpage.html
+@@ -0,0 +1,29 @@
++<script src="./a.out.js"></script>
++<script>
++    class Fraction {
++        numerator;
++        denominator;
++        str;
++
++        constructor(numerator, denominator, str, print_func) {
++            this.numerator = numerator;
++            this.denominator = denominator;
++            this.str = str;
++        }
++    }
++
++    Module.js_print = function(arg_string) {
++        console.log(arg_string);
++    }
++
++    const frac1 = new Fraction(10, 13, "Hello");
++    const frac2 = new Fraction(9, 17, "World!");
++
++    Module.onRuntimeInitialized = async () => {
++        const api = {
++            frac_mult: Module.cwrap("frac_mult", "number", ["number", "number", "string", "number", "number", "string"]),
++        };
++        const retval = api.frac_mult(frac1.numerator, frac1.denominator, frac1.str, frac2.numerator, frac2.denominator, frac2.str);
++        console.log(`Error code = ${retval}`);
++    };
++</script>
