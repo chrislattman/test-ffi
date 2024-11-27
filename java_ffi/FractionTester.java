@@ -11,8 +11,8 @@ public class FractionTester {
         int numerator, denominator;
         String str;
 
-        void printFunc(String arg_string) {
-            System.out.println(arg_string);
+        void printFunc(String argString) {
+            System.out.println(argString);
         }
     }
 
