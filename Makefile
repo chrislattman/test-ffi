@@ -27,6 +27,8 @@ ifeq ($(LIB_GO),1)
 LIB=libfraction_go
 else ifeq ($(LIB_RUST),1)
 LIB=libfraction_rust
+else ifeq ($(LIB_CPP),1)
+LIB=libfraction_cpp
 else
 LIB=libfraction
 endif
@@ -70,6 +72,9 @@ libfraction_go:
 
 libfraction_rust:
 	rustc --crate-type=cdylib -o libfraction$(LIBEXT) libfraction.rs
+
+libfraction_cpp:
+	g++ -Wall -Wextra -pedantic -std=c++14 -shared -fpic -o libfraction$(LIBEXT) libfraction.cpp
 
 clean:
 	rm -rf *$(LIBEXT) **/*$(LIBEXT) go_ffi/go_ffi build java_ffi/*.class target webassembly_ffi/a.out*
