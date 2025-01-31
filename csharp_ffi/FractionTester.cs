@@ -6,7 +6,10 @@ namespace FFI
     // Also referred to by C# as "native interoperability"
     public class FractionTester // This needs to be public static partial class FractionTester if using LibraryImport
     {
-        // Using DllImport instead of LibraryImport due to string marshaling
+        // Using DllImport instead of LibraryImport due to string marshaling in Structs
+        // If using LibraryImport on a Unix system and passing strings:
+        // [LibraryImport("fraction", StringMarshalling = StringMarshalling.Utf8)]
+        // In C# (and on Windows), strings are encoded as UTF-16 (wide chars)
         [DllImport("fraction")]
         private static extern int fraction_multiply(ref Fraction frac1, ref Fraction frac2);
 
