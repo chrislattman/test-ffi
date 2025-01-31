@@ -8,3 +8,5 @@ build/
 go_ffi/go_ffi
 target/
 a.out*
+csharp_ffi/bin
+csharp_ffi/obj

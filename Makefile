@@ -4,7 +4,7 @@ OS=$(shell echo `uname -a`)
 PWD=$(shell pwd)
 
 ifneq ($(findstring x86_64,$(OS)),)
-INCLUDE=/usr/local/Cellar/openjdk/23.0.1/include # this is for jni.h
+INCLUDE=/usr/local/Cellar/openjdk/23.0.2/include # this is for jni.h
 ARCH=amd64
 else
 INCLUDE=/opt/homebrew/opt/openjdk/include # this is for jni.h
@@ -63,6 +63,9 @@ webassembly:
 	# Compiling libfraction.c with wasm_ffi.c since web browsers cannot run ELF binaries
 	cd webassembly_ffi; emcc -sEXPORTED_RUNTIME_METHODS=["cwrap"] wasm_ffi.c ../libfraction.c; python3 -m http.server
 
+csharp: $(LIB)
+	dotnet run --project csharp_ffi
+
 libfraction:
 	$(CC) $(CFLAGS) -o libfraction$(LIBEXT) libfraction.c
 
@@ -77,7 +80,7 @@ libfraction_cpp:
 	g++ -Wall -Wextra -pedantic -std=c++14 -shared -fpic -o libfraction$(LIBEXT) libfraction.cpp
 
 clean:
-	rm -rf *$(LIBEXT) **/*$(LIBEXT) go_ffi/go_ffi build java_ffi/*.class target webassembly_ffi/a.out*
+	rm -rf *$(LIBEXT) **/*$(LIBEXT) go_ffi/go_ffi build java_ffi/*.class target webassembly_ffi/a.out* csharp_ffi/bin csharp_ffi/obj
 
 help:
 	@echo "To use the Go fraction library add LIB_GO=1, e.g. make python LIB_GO=1"
