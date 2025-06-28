@@ -1,7 +1,7 @@
-use std::ffi::{c_char, c_int, c_void, CStr, CString};
+use std::ffi::{CStr, CString, c_char, c_int, c_void};
 
 #[link(name = "fraction")]
-extern "C" {
+unsafe extern "C" {
     fn fraction_multiply(frac1: *mut c_void, frac2: *mut c_void) -> c_int;
 }
 
@@ -15,7 +15,7 @@ struct Fraction {
 
 fn rust_print(arg_string: *const c_char) {
     let result = unsafe { CStr::from_ptr(arg_string) };
-    println!("{}", String::from_utf8_lossy(result.to_bytes()).to_string());
+    println!("{}", String::from_utf8_lossy(result.to_bytes()));
 }
 
 fn main() {
@@ -41,5 +41,5 @@ fn main() {
     let frac2_void_p = frac2_ptr as *mut c_void;
     let retval = unsafe { fraction_multiply(frac1_void_p, frac2_void_p) };
     println!("10/13 * 9/17 = {}/{}", frac1.numerator, frac1.denominator);
-    println!("Error code = {}", retval);
+    println!("Error code = {retval}");
 }

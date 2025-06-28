@@ -12,7 +12,7 @@ ARCH=arm64
 endif
 
 ifneq ($(findstring Darwin,$(OS)),)
-CC=gcc-14
+CC=gcc-15
 LIBEXT=.dylib
 else
 CC=gcc
