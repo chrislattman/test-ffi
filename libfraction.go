@@ -17,7 +17,7 @@ import "C"
 import "fmt"
 
 //export fraction_multiply
-func fraction_multiply(frac1 *C.Fraction, frac2 *C.Fraction) int32 {
+func fraction_multiply(frac1, frac2 *C.Fraction) int32 {
 	if frac1 != nil && frac2 != nil {
 		numerator := frac1.numerator * frac2.numerator
 		denominator := frac1.denominator * frac2.denominator
