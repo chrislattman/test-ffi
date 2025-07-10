@@ -74,7 +74,8 @@ libfraction_go:
 	rm libfraction.h
 
 libfraction_rust:
-	rustc --crate-type=cdylib -o libfraction$(LIBEXT) libfraction.rs
+	# rustc --crate-type=cdylib -o libfraction$(LIBEXT) libfraction.rs
+	cargo build --lib && mv target/debug/libfraction$(LIBEXT) ./libfraction$(LIBEXT)
 
 libfraction_cpp:
 	g++ -Wall -Wextra -pedantic -std=c++14 -shared -fpic -o libfraction$(LIBEXT) libfraction.cpp

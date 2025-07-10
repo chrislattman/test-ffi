@@ -9,4 +9,7 @@ edition = "2024"
 name = "rust_ffi"
 path = "rust_ffi/fraction_tester.rs"
 
-[dependencies]
+[lib]
+name = "fraction"
+path = "libfraction.rs"
+crate-type = ["cdylib"]

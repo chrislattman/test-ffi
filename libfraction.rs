@@ -8,8 +8,11 @@ pub struct Fraction {
     print_func: fn(*const c_char),
 }
 
-#[no_mangle]
-pub extern "C" fn fraction_multiply(frac1: *mut Fraction, frac2: *mut Fraction) -> i32 {
+/// # Safety
+///
+/// `frac1` and `frac2` should not be null
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn fraction_multiply(frac1: *mut Fraction, frac2: *mut Fraction) -> i32 {
     if !frac1.is_null() && !frac2.is_null() {
         unsafe {
             let numerator = (*frac1).numerator * (*frac2).numerator;
@@ -22,5 +25,5 @@ pub extern "C" fn fraction_multiply(frac1: *mut Fraction, frac2: *mut Fraction) 
             return 0;
         }
     }
-    return -1;
+    -1
 }
