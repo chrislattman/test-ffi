@@ -13,4 +13,6 @@ Build and run the examples using the provided Makefile.
 
 Note: C and C++ are not the only languages that can be called by high-level languages. Go and Rust support exporting code in library format. This repository contains support for calling functions from libfraction.go and libfraction.rs.
 
+Surprisingly enough, it's possible to compile Java and C# code into native libraries. GraalVM accomplishes this for Java, and an example is located in this repository (the Makefile assumes GraalVM is installed and set as the default Java compiler). C# has built-in support for native library compilation. Python 3 has unofficial native library support via PyInstaller and there is currently no official support for Node.js native binaries.
+
 For the WebAssembly example, the print function isn't passed down, but it's made available as a module function. To view the results, open http://localhost:8000/webpage.html in a web browser, right click and inspect the page (opens DevTools), and open the console. Then refresh the page.
