@@ -63,8 +63,12 @@ public class LibFraction {
             int denominator = frac1.getDenominator() * frac2.getDenominator();
             frac1.setNumerator(numerator);
             frac1.setDenominator(denominator);
-            frac1.getPrintFunc().invoke(frac1.getStr());
-            frac2.getPrintFunc().invoke(frac2.getStr());
+            if (frac1.getPrintFunc().isNonNull() && frac1.getStr().isNonNull()) {
+                frac1.getPrintFunc().invoke(frac1.getStr());
+            }
+            if (frac2.getPrintFunc().isNonNull() && frac2.getStr().isNonNull()) {
+                frac2.getPrintFunc().invoke(frac2.getStr());
+            }
             System.out.println("Finished with calculation!");
             return 0;
         }

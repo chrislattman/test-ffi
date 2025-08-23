@@ -24,8 +24,12 @@ int fraction_multiply(Fraction *frac1, Fraction *frac2) {
         int denominator = frac1->denominator * frac2->denominator;
         frac1->numerator = numerator;
         frac1->denominator = denominator;
-        frac1->print_func(frac1->str);
-        frac2->print_func(frac2->str);
+        if (frac1->print_func != NULL && frac1->str != NULL) {
+            frac1->print_func(frac1->str);
+        }
+        if (frac2->print_func != NULL && frac2->str != NULL) {
+            frac2->print_func(frac2->str);
+        }
         printf("Finished with calculation!\n");
         return 0;
     }
