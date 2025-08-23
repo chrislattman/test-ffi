@@ -84,10 +84,6 @@ libfraction_rust:
 	cargo build -q --lib && mv target/debug/libfraction$(LIBEXT) ./libfraction$(LIBEXT)
 
 libfraction_java:
-# 	javac LibEnvMap.java
-# 	native-image --shared -o libenvmap
-# 	$(CC) -I. -Wl,-rpath . -o envmap envmap.c ./libenvmap$(LIBEXT)
-#   Then run ./main <ENV_VAR>
 	echo "public class Constants { public static final String PWD = \"$(PWD)\"; }" > Constants.java
 	javac Constants.java LibFraction.java
 	native-image --shared -o libgraalvmfraction --silent
