@@ -10,3 +10,6 @@ target/
 a.out*
 csharp_ffi/bin
 csharp_ffi/obj
+graal_isolate*.h
+libgraalvmfraction*.h
+Constants.java
