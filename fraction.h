@@ -1,5 +1,5 @@
 // This file exists because GraalVM currently cannot autogenerate C header files
-// from Java interfaces with @CStruct annotations (e.g. Fraction.java)
+// from Java interfaces with @CStruct annotations (e.g. LibFraction.java)
 typedef struct fraction {
     int numerator, denominator;
     const char *str;

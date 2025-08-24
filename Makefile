@@ -40,7 +40,7 @@ endif
 java: $(LIB)
 	$(CC) $(CLIBFLAGS) -I$(INCLUDE) $(INCLUDE2) -o java_ffi/libjava_ffi$(LIBEXT) java_ffi/java_ffi_FractionTester.c
 	javac java_ffi/FractionTester.java
-	java --enable-native-access=ALL-UNNAMED -Djava.library.path=$(PWD)/java_ffi java_ffi/FractionTester
+	java --enable-native-access=ALL-UNNAMED -Djava.library.path=$(PWD)/java_ffi java_ffi/FractionTester # Crashing with LIB_CPP=1 and not finishing with LIB_GO=1
 
 csharp: $(LIB)
 	dotnet run --project csharp_ffi
@@ -50,12 +50,12 @@ python: $(LIB)
 
 nodejs: $(LIB)
 	npx node-gyp rebuild --loglevel silent
-	npm start
+	npm start # Not printing "Hello World!" for any libfraction
 
 go: $(LIB)
 	$(CC) $(CLIBFLAGS) -o go_ffi/libgo_ffi$(LIBEXT) go_ffi/go_ffi.c
 	cd go_ffi; go build
-	go_ffi/go_ffi
+	go_ffi/go_ffi # Crashes with LIB_GO=1
 	# go run go_ffi/fraction_tester.go go_ffi/cfuncs.go
 
 rust: $(LIB)
@@ -76,7 +76,7 @@ libfraction_cpp:
 	$(CXX) -Wall -Wextra -pedantic -std=c++14 -shared -fpic -o libfraction$(LIBEXT) libfraction.cpp
 
 libfraction_go:
-	go build -buildmode=c-shared -o libfraction$(LIBEXT) libfraction.go
+	go build -buildmode=c-shared -o libfraction$(LIBEXT) go_libfraction/libfraction.go
 	rm libfraction.h
 
 libfraction_rust:

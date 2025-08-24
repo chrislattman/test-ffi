@@ -23,14 +23,16 @@ func fraction_multiply(frac1, frac2 *C.Fraction) int32 {
 		denominator := frac1.denominator * frac2.denominator
 		frac1.numerator = numerator
 		frac1.denominator = denominator
-		C.bridge_print_func(C.print_func_t(frac1.print_func), frac1.str)
-		C.bridge_print_func(C.print_func_t(frac2.print_func), frac2.str)
+		if frac1.print_func != nil && frac1.str != nil {
+			C.bridge_print_func(C.print_func_t(frac1.print_func), frac1.str)
+		}
+		if frac2.print_func != nil && frac2.str != nil {
+			C.bridge_print_func(C.print_func_t(frac2.print_func), frac2.str)
+		}
 		fmt.Println("Finished with calculation!")
 		return 0
 	}
 	return -1
 }
 
-func main() {
-
-}
+func main() {}

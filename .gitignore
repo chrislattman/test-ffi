@@ -13,3 +13,4 @@ csharp_ffi/obj
 graal_isolate*.h
 libgraalvmfraction*.h
 Constants.java
+*.log
