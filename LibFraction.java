@@ -1,3 +1,4 @@
+import java.nio.ByteBuffer;
 import java.util.List;
 
 import org.graalvm.nativeimage.IsolateThread;
@@ -8,6 +9,7 @@ import org.graalvm.nativeimage.c.function.InvokeCFunctionPointer;
 import org.graalvm.nativeimage.c.struct.CField;
 import org.graalvm.nativeimage.c.struct.CStruct;
 import org.graalvm.nativeimage.c.type.CCharPointer;
+import org.graalvm.nativeimage.c.type.CTypeConversion;
 import org.graalvm.word.PointerBase;
 
 @CContext(CHeaderDirectives.class)
@@ -36,6 +38,18 @@ interface Fraction extends PointerBase {
 
     @CField("print_func")
     void setPrintFunc(PrintFunc func);
+
+    @CField("bytes")
+    CCharPointer getBytes();
+
+    @CField("bytes")
+    void setBytes(CCharPointer bytes);
+
+    @CField("bytes_len")
+    long getBytesLen();
+
+    @CField("bytes_len")
+    void setBytesLen(long len);
 }
 
 interface PrintFunc extends CFunctionPointer {
@@ -69,6 +83,20 @@ public class LibFraction {
             if (frac2.getPrintFunc().isNonNull() && frac2.getStr().isNonNull()) {
                 frac2.getPrintFunc().invoke(frac2.getStr());
             }
+            ByteBuffer frac1ByteBuffer = CTypeConversion.asByteBuffer(frac1.getBytes(), (int) frac1.getBytesLen());
+            ByteBuffer frac2ByteBuffer = CTypeConversion.asByteBuffer(frac2.getBytes(), (int) frac2.getBytesLen());
+            byte[] frac1Bytes = new byte[frac1ByteBuffer.limit()];
+            byte[] frac2Bytes = new byte[frac2ByteBuffer.limit()];
+            frac1ByteBuffer.get(frac1Bytes);
+            frac2ByteBuffer.get(frac2Bytes);
+            int counter = 0;
+            for (byte elem : frac1Bytes) {
+                counter += elem;
+            }
+            for (byte elem : frac2Bytes) {
+                counter += elem;
+            }
+            System.out.println("The average of the bytes in frac1 and frac2 = " + counter / (frac1Bytes.length + frac2Bytes.length));
             System.out.println("Finished with calculation!");
             return 0;
         }

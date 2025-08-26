@@ -1,4 +1,5 @@
 using System.Runtime.InteropServices;
+using System.Text;
 
 namespace FFI
 {
@@ -22,23 +23,33 @@ namespace FFI
 
         public static void Main() // optionally add string[] args like Java
         {
+            byte[] frac1Bytes = Encoding.UTF8.GetBytes("somedata");
+            byte[] frac2Bytes = Encoding.UTF8.GetBytes("somemoredata");
             Fraction frac1 = new()
             {
                 numerator = 10,
                 denominator = 13,
                 str = "Hello",
-                printFunc = CsPrintFunc
+                printFunc = CsPrintFunc,
+                bytes = Marshal.AllocHGlobal(frac1Bytes.Length),
+                bytesLen = (UIntPtr)frac1Bytes.Length
             };
             Fraction frac2 = new()
             {
                 numerator = 9,
                 denominator = 17,
                 str = "World!",
-                printFunc = CsPrintFunc
+                printFunc = CsPrintFunc,
+                bytes = Marshal.AllocHGlobal(frac2Bytes.Length),
+                bytesLen = (UIntPtr)frac2Bytes.Length
             };
+            Marshal.Copy(frac1Bytes, 0, frac1.bytes, frac1Bytes.Length);
+            Marshal.Copy(frac2Bytes, 0, frac2.bytes, frac2Bytes.Length);
             int retval = fraction_multiply(ref frac1, ref frac2);
             Console.WriteLine("10/13 * 9/17 = " + frac1.numerator + "/" + frac1.denominator);
             Console.WriteLine("Error code = " + retval);
+            Marshal.FreeHGlobal(frac1.bytes);
+            Marshal.FreeHGlobal(frac2.bytes);
         }
     }
 
@@ -48,5 +59,7 @@ namespace FFI
         public int numerator, denominator;
         public string str;
         public FractionTester.PrintFuncType printFunc;
+        public IntPtr bytes;
+        public UIntPtr bytesLen;
     }
 }

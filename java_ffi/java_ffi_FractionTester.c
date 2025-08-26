@@ -16,6 +16,8 @@ typedef struct fraction {
     int numerator, denominator;
     const char *str;
     void (*print_func)(const char *);
+    unsigned char *bytes;
+    size_t bytes_len;
 } Fraction;
 
 static void frac1_print_func(const char *arg_str) {
@@ -41,9 +43,12 @@ JNIEXPORT jint JNICALL Java_java_1ffi_FractionTester_fractionMultiply(
     int (*fraction_multiply)(Fraction *, Fraction *);
 
     jclass frac1Class, frac2Class;
-    jfieldID frac1NumeratorID, frac2NumeratorID, frac1DenominatorID, frac2DenominatorID, frac1StrID, frac2StrID;
+    jfieldID frac1NumeratorID, frac2NumeratorID, frac1DenominatorID, frac2DenominatorID,
+        frac1StrID, frac2StrID, frac1BytesID, frac2BytesID;
     jint frac1Numerator, frac2Numerator, frac1Denominator, frac2Denominator;
-    jobject frac1StrObj, frac2StrObj;
+    jobject frac1StrObj, frac2StrObj, frac1BytesObj, frac2BytesObj;
+    jbyte *frac1Bytes, *frac2Bytes;
+    jsize frac1BytesLen, frac2BytesLen;
 
     const char *frac1Str, *frac2Str;
     Fraction f1, f2;
@@ -54,6 +59,9 @@ JNIEXPORT jint JNICALL Java_java_1ffi_FractionTester_fractionMultiply(
 
     // String signature from https://docs.oracle.com/en/java/javase/21/docs/specs/jni/types.html#type-signatures
     const char *str_sig = "Ljava/lang/String;";
+
+    // byte[] signature from https://docs.oracle.com/en/java/javase/21/docs/specs/jni/types.html#type-signatures
+    const char *bytes_sig = "[B";
 
     // Function pointer signature (V means void return type)
     const char *func_ptr_sig = "(Ljava/lang/String;)V";
@@ -91,6 +99,8 @@ JNIEXPORT jint JNICALL Java_java_1ffi_FractionTester_fractionMultiply(
     frac2DenominatorID = (*env)->GetFieldID(env, frac2Class, "denominator", int_sig);
     frac1StrID = (*env)->GetFieldID(env, frac1Class, "str", str_sig);
     frac2StrID = (*env)->GetFieldID(env, frac2Class, "str", str_sig);
+    frac1BytesID = (*env)->GetFieldID(env, frac1Class, "bytes", bytes_sig);
+    frac2BytesID = (*env)->GetFieldID(env, frac2Class, "bytes", bytes_sig);
 
     // Obtains the actual integer values from the IDs above
     // These are jints which are typedef'd ints
@@ -99,11 +109,17 @@ JNIEXPORT jint JNICALL Java_java_1ffi_FractionTester_fractionMultiply(
     frac2Numerator = (*env)->GetIntField(env, frac2, frac2NumeratorID);
     frac2Denominator = (*env)->GetIntField(env, frac2, frac2DenominatorID);
 
-    // Extracts the strings from the Fraction jobjects
+    // Extracts the strings and byte arrays (and lengths) from the Fraction jobjects
     frac1StrObj = (*env)->GetObjectField(env, frac1, frac1StrID);
     frac1Str = (*env)->GetStringUTFChars(env, frac1StrObj, NULL);
     frac2StrObj = (*env)->GetObjectField(env, frac2, frac2StrID);
     frac2Str = (*env)->GetStringUTFChars(env, frac2StrObj, NULL);
+    frac1BytesObj = (*env)->GetObjectField(env, frac1, frac1BytesID);
+    frac1Bytes = (*env)->GetByteArrayElements(env, frac1BytesObj, NULL);
+    frac1BytesLen = (*env)->GetArrayLength(env, frac1BytesObj);
+    frac2BytesObj = (*env)->GetObjectField(env, frac2, frac2BytesID);
+    frac2Bytes = (*env)->GetByteArrayElements(env, frac2BytesObj, NULL);
+    frac2BytesLen = (*env)->GetArrayLength(env, frac2BytesObj);
 
     // Obtains the method IDs of the Java callback functions and sets
     // global variables used by callback functions
@@ -118,13 +134,17 @@ JNIEXPORT jint JNICALL Java_java_1ffi_FractionTester_fractionMultiply(
         .numerator = frac1Numerator,
         .denominator = frac1Denominator,
         .str = frac1Str,
-        .print_func = frac1_print_func
+        .print_func = frac1_print_func,
+        .bytes = (unsigned char *)frac1Bytes,
+        .bytes_len = (size_t)frac1BytesLen
     };
     f2 = (Fraction) {
         .numerator = frac2Numerator,
         .denominator = frac2Denominator,
         .str = frac2Str,
-        .print_func = frac2_print_func
+        .print_func = frac2_print_func,
+        .bytes = (unsigned char *)frac2Bytes,
+        .bytes_len = (size_t)frac2BytesLen
     };
     retval = fraction_multiply(&f1, &f2);
 
