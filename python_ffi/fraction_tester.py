@@ -12,7 +12,8 @@ class Fraction(ctypes.Structure):
         ("denominator", ctypes.c_int),
         ("str", ctypes.c_char_p),
         ("print_func", PRINT_FUNC_TYPE),
-        ("bytes", ctypes.POINTER(ctypes.c_ubyte)),
+        ("in_bytes", ctypes.POINTER(ctypes.c_ubyte)),
+        ("out_bytes", ctypes.POINTER(ctypes.c_ubyte)),
         ("bytes_len", ctypes.c_size_t),
     ]
 
@@ -33,10 +34,20 @@ else:
 
 # Optional for our purposes, but necessary for variadic functions
 # libfraction.fraction_multiply.argtypes = [ctypes.POINTER(Fraction), ctypes.POINTER(Fraction)]
-buf1 = ctypes.create_string_buffer(b"somedata")
-buf2 = ctypes.create_string_buffer(b"somemoredata")
-frac1 = Fraction(10, 13, b"Hello", print_func, ctypes.cast(buf1, ctypes.POINTER(ctypes.c_ubyte)), len(buf1.value))
-frac2 = Fraction(9, 17, b"World!", print_func, ctypes.cast(buf2, ctypes.POINTER(ctypes.c_ubyte)), len(buf2.value))
+in_buf1 = ctypes.create_string_buffer(b"somedata")
+out_buf1 = ctypes.create_string_buffer(len(b"somedata"))
+in_buf2 = ctypes.create_string_buffer(b"somemoredata")
+out_buf2 = ctypes.create_string_buffer(len(b"somemoredata"))
+frac1 = Fraction(10, 13, b"Hello", print_func,
+                 ctypes.cast(in_buf1, ctypes.POINTER(ctypes.c_ubyte)),
+                 ctypes.cast(out_buf1, ctypes.POINTER(ctypes.c_ubyte)),
+                 len(in_buf1.value))
+frac2 = Fraction(9, 17, b"World!", print_func,
+                 ctypes.cast(in_buf2, ctypes.POINTER(ctypes.c_ubyte)),
+                 ctypes.cast(out_buf2, ctypes.POINTER(ctypes.c_ubyte)),
+                 len(in_buf2.value))
 retval = libfraction.fraction_multiply(ctypes.pointer(frac1), ctypes.pointer(frac2))
 print(f"10/13 * 9/17 = {frac1.numerator}/{frac1.denominator}")
+print(f"b'somedata' XOR 0x5c = 0x{out_buf1.raw.hex()}")
+print(f"b'somemoredata' XOR 0x5c = 0x{out_buf2.raw.hex()}")
 print(f"Error code = {retval}")

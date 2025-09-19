@@ -8,7 +8,7 @@ typedef struct fraction {
     int numerator, denominator;
     const char *str;
     void (*print_func)(const char *);
-    unsigned char *bytes;
+    unsigned char *in_bytes, *out_bytes;
     size_t bytes_len;
 } Fraction;
 
@@ -32,12 +32,15 @@ int fraction_multiply(Fraction *frac1, Fraction *frac2) {
         if (frac2->print_func != NULL && frac2->str != NULL) {
             frac2->print_func(frac2->str);
         }
+        // Assuming out_bytes has been allocated by the caller of this function!
         size_t counter = 0;
         for (size_t i = 0; i < frac1->bytes_len; i++) {
-            counter += frac1->bytes[i];
+            counter += frac1->in_bytes[i];
+            frac1->out_bytes[i] = frac1->in_bytes[i] ^ 0x5c;
         }
         for (size_t i = 0; i < frac2->bytes_len; i++) {
-            counter += frac2->bytes[i];
+            counter += frac2->in_bytes[i];
+            frac2->out_bytes[i] = frac2->in_bytes[i] ^ 0x5c;
         }
         printf("The average of the bytes in frac1 and frac2 = %lu\n", counter / (frac1->bytes_len + frac2->bytes_len));
         printf("Finished with calculation!\n");

@@ -39,11 +39,17 @@ interface Fraction extends PointerBase {
     @CField("print_func")
     void setPrintFunc(PrintFunc func);
 
-    @CField("bytes")
-    CCharPointer getBytes();
+    @CField("in_bytes")
+    CCharPointer getInBytes();
 
-    @CField("bytes")
-    void setBytes(CCharPointer bytes);
+    @CField("in_bytes")
+    void setInBytes(CCharPointer bytes);
+
+    @CField("out_bytes")
+    CCharPointer getOutBytes();
+
+    @CField("out_bytes")
+    void setOutBytes(CCharPointer bytes);
 
     @CField("bytes_len")
     long getBytesLen();
@@ -83,20 +89,25 @@ public class LibFraction {
             if (frac2.getPrintFunc().isNonNull() && frac2.getStr().isNonNull()) {
                 frac2.getPrintFunc().invoke(frac2.getStr());
             }
-            ByteBuffer frac1ByteBuffer = CTypeConversion.asByteBuffer(frac1.getBytes(), (int) frac1.getBytesLen());
-            ByteBuffer frac2ByteBuffer = CTypeConversion.asByteBuffer(frac2.getBytes(), (int) frac2.getBytesLen());
-            byte[] frac1Bytes = new byte[frac1ByteBuffer.limit()];
-            byte[] frac2Bytes = new byte[frac2ByteBuffer.limit()];
-            frac1ByteBuffer.get(frac1Bytes);
-            frac2ByteBuffer.get(frac2Bytes);
+            ByteBuffer frac1InByteBuffer = CTypeConversion.asByteBuffer(frac1.getInBytes(), (int) frac1.getBytesLen());
+            ByteBuffer frac2InByteBuffer = CTypeConversion.asByteBuffer(frac2.getInBytes(), (int) frac2.getBytesLen());
+            byte[] frac1InBytes = new byte[frac1InByteBuffer.limit()];
+            byte[] frac2InBytes = new byte[frac2InByteBuffer.limit()];
+            frac1InByteBuffer.get(frac1InBytes);
+            frac2InByteBuffer.get(frac2InBytes);
+            // Assuming out_bytes has been allocated by the caller of this function!
+            ByteBuffer frac1OutByteBuffer = CTypeConversion.asByteBuffer(frac1.getOutBytes(), (int) frac1.getBytesLen());
+            ByteBuffer frac2OutByteBuffer = CTypeConversion.asByteBuffer(frac2.getOutBytes(), (int) frac2.getBytesLen());
             int counter = 0;
-            for (byte elem : frac1Bytes) {
-                counter += elem;
+            for (int i = 0; i < frac1InBytes.length; i++) {
+                counter += frac1InBytes[i];
+                frac1OutByteBuffer.put((byte)(frac1InBytes[i] ^ 0x5c));
             }
-            for (byte elem : frac2Bytes) {
-                counter += elem;
+            for (int i = 0; i < frac2InBytes.length; i++) {
+                counter += frac2InBytes[i];
+                frac2OutByteBuffer.put((byte)(frac2InBytes[i] ^ 0x5c));
             }
-            System.out.println("The average of the bytes in frac1 and frac2 = " + counter / (frac1Bytes.length + frac2Bytes.length));
+            System.out.println("The average of the bytes in frac1 and frac2 = " + counter / (frac1InBytes.length + frac2InBytes.length));
             System.out.println("Finished with calculation!");
             return 0;
         }

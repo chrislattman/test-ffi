@@ -15,6 +15,7 @@ void print_cgo(const char *);
 */
 import "C"
 import (
+	"encoding/hex"
 	"fmt"
 	"unsafe"
 )
@@ -32,8 +33,9 @@ func main() {
 	frac1.print_func = (*[0]byte)(C.print_cgo)
 	buf1 := []byte("somedata")
 	frac1.bytes_len = C.size_t(len(buf1))
-	frac1.bytes = (*C.uchar)(C.malloc(frac1.bytes_len))
-	C.memcpy(unsafe.Pointer(frac1.bytes), unsafe.Pointer(&buf1[0]), frac1.bytes_len)
+	frac1.in_bytes = (*C.uchar)(C.malloc(frac1.bytes_len))
+	frac1.out_bytes = (*C.uchar)(C.malloc(frac1.bytes_len))
+	C.memcpy(unsafe.Pointer(frac1.in_bytes), unsafe.Pointer(&buf1[0]), frac1.bytes_len)
 	frac2 := C.Fraction{}
 	frac2.numerator = 9
 	frac2.denominator = 17
@@ -41,14 +43,21 @@ func main() {
 	frac2.print_func = (*[0]byte)(C.print_cgo)
 	buf2 := []byte("somemoredata")
 	frac2.bytes_len = C.size_t(len(buf2))
-	frac2.bytes = (*C.uchar)(C.malloc(frac2.bytes_len))
-	C.memcpy(unsafe.Pointer(frac2.bytes), unsafe.Pointer(&buf2[0]), frac2.bytes_len)
+	frac2.in_bytes = (*C.uchar)(C.malloc(frac2.bytes_len))
+	frac2.out_bytes = (*C.uchar)(C.malloc(frac2.bytes_len))
+	C.memcpy(unsafe.Pointer(frac2.in_bytes), unsafe.Pointer(&buf2[0]), frac2.bytes_len)
 
 	retval := C.frac_mult(&frac1, &frac2)
 	fmt.Printf("10/13 * 9/17 = %d/%d\n", frac1.numerator, frac1.denominator)
+	frac1Result := C.GoBytes(unsafe.Pointer(frac1.out_bytes), C.int(frac1.bytes_len))
+	frac2Result := C.GoBytes(unsafe.Pointer(frac2.out_bytes), C.int(frac2.bytes_len))
+	fmt.Printf("b'somedata' XOR 0x5c = 0x%s\n", hex.EncodeToString(frac1Result))
+	fmt.Printf("b'somemoredata' XOR 0x5c = 0x%s\n", hex.EncodeToString(frac2Result))
 	fmt.Println("Error code =", retval)
-	C.free(unsafe.Pointer(frac1.bytes))
-	C.free(unsafe.Pointer(frac2.bytes))
+	C.free(unsafe.Pointer(frac1.in_bytes))
+	C.free(unsafe.Pointer(frac2.in_bytes))
+	C.free(unsafe.Pointer(frac1.out_bytes))
+	C.free(unsafe.Pointer(frac2.out_bytes))
 	C.free(unsafe.Pointer(frac1.str))
 	C.free(unsafe.Pointer(frac2.str))
 }

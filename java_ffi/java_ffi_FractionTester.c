@@ -16,7 +16,7 @@ typedef struct fraction {
     int numerator, denominator;
     const char *str;
     void (*print_func)(const char *);
-    unsigned char *bytes;
+    unsigned char *in_bytes, *out_bytes;
     size_t bytes_len;
 } Fraction;
 
@@ -44,10 +44,10 @@ JNIEXPORT jint JNICALL Java_java_1ffi_FractionTester_fractionMultiply(
 
     jclass frac1Class, frac2Class;
     jfieldID frac1NumeratorID, frac2NumeratorID, frac1DenominatorID, frac2DenominatorID,
-        frac1StrID, frac2StrID, frac1BytesID, frac2BytesID;
+        frac1StrID, frac2StrID, frac1InBytesID, frac2InBytesID, frac1OutBytesID, frac2OutBytesID;
     jint frac1Numerator, frac2Numerator, frac1Denominator, frac2Denominator;
-    jobject frac1StrObj, frac2StrObj, frac1BytesObj, frac2BytesObj;
-    jbyte *frac1Bytes, *frac2Bytes;
+    jobject frac1StrObj, frac2StrObj, frac1InBytesObj, frac2InBytesObj, frac1OutBytesObj, frac2OutBytesObj;
+    jbyte *frac1InBytes, *frac2InBytes, *frac1OutBytes, *frac2OutBytes;
     jsize frac1BytesLen, frac2BytesLen;
 
     const char *frac1Str, *frac2Str;
@@ -99,8 +99,10 @@ JNIEXPORT jint JNICALL Java_java_1ffi_FractionTester_fractionMultiply(
     frac2DenominatorID = (*env)->GetFieldID(env, frac2Class, "denominator", int_sig);
     frac1StrID = (*env)->GetFieldID(env, frac1Class, "str", str_sig);
     frac2StrID = (*env)->GetFieldID(env, frac2Class, "str", str_sig);
-    frac1BytesID = (*env)->GetFieldID(env, frac1Class, "bytes", bytes_sig);
-    frac2BytesID = (*env)->GetFieldID(env, frac2Class, "bytes", bytes_sig);
+    frac1InBytesID = (*env)->GetFieldID(env, frac1Class, "inBytes", bytes_sig);
+    frac2InBytesID = (*env)->GetFieldID(env, frac2Class, "inBytes", bytes_sig);
+    frac1OutBytesID = (*env)->GetFieldID(env, frac1Class, "outBytes", bytes_sig);
+    frac2OutBytesID = (*env)->GetFieldID(env, frac2Class, "outBytes", bytes_sig);
 
     // Obtains the actual integer values from the IDs above
     // These are jints which are typedef'd ints
@@ -114,12 +116,16 @@ JNIEXPORT jint JNICALL Java_java_1ffi_FractionTester_fractionMultiply(
     frac1Str = (*env)->GetStringUTFChars(env, frac1StrObj, NULL);
     frac2StrObj = (*env)->GetObjectField(env, frac2, frac2StrID);
     frac2Str = (*env)->GetStringUTFChars(env, frac2StrObj, NULL);
-    frac1BytesObj = (*env)->GetObjectField(env, frac1, frac1BytesID);
-    frac1Bytes = (*env)->GetByteArrayElements(env, frac1BytesObj, NULL);
-    frac1BytesLen = (*env)->GetArrayLength(env, frac1BytesObj);
-    frac2BytesObj = (*env)->GetObjectField(env, frac2, frac2BytesID);
-    frac2Bytes = (*env)->GetByteArrayElements(env, frac2BytesObj, NULL);
-    frac2BytesLen = (*env)->GetArrayLength(env, frac2BytesObj);
+    frac1InBytesObj = (*env)->GetObjectField(env, frac1, frac1InBytesID);
+    frac1InBytes = (*env)->GetByteArrayElements(env, frac1InBytesObj, NULL);
+    frac1OutBytesObj = (*env)->GetObjectField(env, frac1, frac1OutBytesID);
+    frac1OutBytes = (*env)->GetPrimitiveArrayCritical(env, frac1OutBytesObj, NULL);
+    frac1BytesLen = (*env)->GetArrayLength(env, frac1InBytesObj);
+    frac2InBytesObj = (*env)->GetObjectField(env, frac2, frac2InBytesID);
+    frac2InBytes = (*env)->GetByteArrayElements(env, frac2InBytesObj, NULL);
+    frac2OutBytesObj = (*env)->GetObjectField(env, frac2, frac2OutBytesID);
+    frac2OutBytes = (*env)->GetPrimitiveArrayCritical(env, frac2OutBytesObj, NULL);
+    frac2BytesLen = (*env)->GetArrayLength(env, frac2InBytesObj);
 
     // Obtains the method IDs of the Java callback functions and sets
     // global variables used by callback functions
@@ -135,7 +141,8 @@ JNIEXPORT jint JNICALL Java_java_1ffi_FractionTester_fractionMultiply(
         .denominator = frac1Denominator,
         .str = frac1Str,
         .print_func = frac1_print_func,
-        .bytes = (unsigned char *)frac1Bytes,
+        .in_bytes = (unsigned char *)frac1InBytes,
+        .out_bytes = (unsigned char *)frac1OutBytes,
         .bytes_len = (size_t)frac1BytesLen
     };
     f2 = (Fraction) {
@@ -143,7 +150,8 @@ JNIEXPORT jint JNICALL Java_java_1ffi_FractionTester_fractionMultiply(
         .denominator = frac2Denominator,
         .str = frac2Str,
         .print_func = frac2_print_func,
-        .bytes = (unsigned char *)frac2Bytes,
+        .in_bytes = (unsigned char *)frac2InBytes,
+        .out_bytes = (unsigned char *)frac2OutBytes,
         .bytes_len = (size_t)frac2BytesLen
     };
     retval = fraction_multiply(&f1, &f2);
@@ -153,8 +161,10 @@ JNIEXPORT jint JNICALL Java_java_1ffi_FractionTester_fractionMultiply(
     (*env)->SetIntField(env, frac1, frac1DenominatorID, f1.denominator);
 
     // Free byte arrays and strings, close file and return error code
-    (*env)->ReleaseByteArrayElements(env, frac1BytesObj, frac1Bytes, JNI_ABORT);
-    (*env)->ReleaseByteArrayElements(env, frac2BytesObj, frac2Bytes, JNI_ABORT);
+    (*env)->ReleaseByteArrayElements(env, frac1InBytesObj, frac1InBytes, JNI_ABORT);
+    (*env)->ReleaseByteArrayElements(env, frac2InBytesObj, frac2InBytes, JNI_ABORT);
+    (*env)->ReleasePrimitiveArrayCritical(env, frac1OutBytesObj, frac1OutBytes, 0);
+    (*env)->ReleasePrimitiveArrayCritical(env, frac2OutBytesObj, frac2OutBytes, 0);
     (*env)->ReleaseStringUTFChars(env, frac1StrObj, frac1Str);
     (*env)->ReleaseStringUTFChars(env, frac2StrObj, frac2Str);
     dlclose(handle);

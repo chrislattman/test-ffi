@@ -31,7 +31,8 @@ namespace FFI
                 denominator = 13,
                 str = "Hello",
                 printFunc = CsPrintFunc,
-                bytes = Marshal.AllocHGlobal(frac1Bytes.Length),
+                inBytes = Marshal.AllocHGlobal(frac1Bytes.Length),
+                outBytes = Marshal.AllocHGlobal(frac1Bytes.Length),
                 bytesLen = (UIntPtr)frac1Bytes.Length
             };
             Fraction frac2 = new()
@@ -40,16 +41,25 @@ namespace FFI
                 denominator = 17,
                 str = "World!",
                 printFunc = CsPrintFunc,
-                bytes = Marshal.AllocHGlobal(frac2Bytes.Length),
+                inBytes = Marshal.AllocHGlobal(frac2Bytes.Length),
+                outBytes = Marshal.AllocHGlobal(frac2Bytes.Length),
                 bytesLen = (UIntPtr)frac2Bytes.Length
             };
-            Marshal.Copy(frac1Bytes, 0, frac1.bytes, frac1Bytes.Length);
-            Marshal.Copy(frac2Bytes, 0, frac2.bytes, frac2Bytes.Length);
+            Marshal.Copy(frac1Bytes, 0, frac1.inBytes, frac1Bytes.Length);
+            Marshal.Copy(frac2Bytes, 0, frac2.inBytes, frac2Bytes.Length);
             int retval = fraction_multiply(ref frac1, ref frac2);
             Console.WriteLine("10/13 * 9/17 = " + frac1.numerator + "/" + frac1.denominator);
+            byte[] frac1Result = new byte[frac1Bytes.Length];
+            Marshal.Copy(frac1.outBytes, frac1Result, 0, frac1Bytes.Length);
+            byte[] frac2Result = new byte[frac2Bytes.Length];
+            Marshal.Copy(frac2.outBytes, frac2Result, 0, frac2Bytes.Length);
+            Console.WriteLine("b'somedata' XOR 0x5c = 0x" + Convert.ToHexStringLower(frac1Result));
+            Console.WriteLine("b'somemoredata' XOR 0x5c = 0x" + Convert.ToHexStringLower(frac2Result));
             Console.WriteLine("Error code = " + retval);
-            Marshal.FreeHGlobal(frac1.bytes);
-            Marshal.FreeHGlobal(frac2.bytes);
+            Marshal.FreeHGlobal(frac1.inBytes);
+            Marshal.FreeHGlobal(frac2.inBytes);
+            Marshal.FreeHGlobal(frac1.outBytes);
+            Marshal.FreeHGlobal(frac2.outBytes);
         }
     }
 
@@ -59,7 +69,7 @@ namespace FFI
         public int numerator, denominator;
         public string str;
         public FractionTester.PrintFuncType printFunc;
-        public IntPtr bytes;
+        public IntPtr inBytes, outBytes;
         public UIntPtr bytesLen;
     }
 }

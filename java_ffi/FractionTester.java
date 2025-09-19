@@ -12,7 +12,7 @@ public class FractionTester {
     static class Fraction {
         int numerator, denominator;
         String str;
-        byte[] bytes;
+        byte[] inBytes, outBytes;
 
         void printFunc(String argString) {
             System.out.println(argString);
@@ -28,14 +28,26 @@ public class FractionTester {
         frac1.numerator = 10;
         frac1.denominator = 13;
         frac1.str = "Hello";
-        frac1.bytes = "somedata".getBytes(StandardCharsets.UTF_8);
+        frac1.inBytes = "somedata".getBytes(StandardCharsets.UTF_8);
+        frac1.outBytes = new byte[frac1.inBytes.length];
         frac2.numerator = 9;
         frac2.denominator = 17;
         frac2.str = "World!";
-        frac2.bytes = "somemoredata".getBytes(StandardCharsets.UTF_8);
+        frac2.inBytes = "somemoredata".getBytes(StandardCharsets.UTF_8);
+        frac2.outBytes = new byte[frac2.inBytes.length];
         FractionTester fractionTester = new FractionTester();
         int retval = fractionTester.fractionMultiply(frac1, frac2);
         System.out.printf("10/13 * 9/17 = %d/%d\n", frac1.numerator, frac1.denominator);
+        System.out.print("b'somedata' XOR 0x5c = 0x");
+        for (int i = 0; i < frac1.outBytes.length; i++) {
+            System.out.printf("%02x", frac1.outBytes[i]);
+        }
+        System.out.println();
+        System.out.print("b'somemoredata' XOR 0x5c = 0x");
+        for (int i = 0; i < frac2.outBytes.length; i++) {
+            System.out.printf("%02x", frac2.outBytes[i]);
+        }
+        System.out.println();
         System.out.println("Error code = " + retval);
     }
 }
